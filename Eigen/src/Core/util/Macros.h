@@ -1008,9 +1008,12 @@ namespace Eigen {
 #  define EIGEN_TRY try
 #  define EIGEN_CATCH(X) catch (X)
 #else
-#  ifdef EIGEN_CUDA_ARCH
+#  if defined(EIGEN_CUDA_ARCH)
 #    define EIGEN_THROW_X(X) asm("trap;")
 #    define EIGEN_THROW asm("trap;")
+#  elif defined(EIGEN_HIP_DEVICE_COMPILE)
+#    define EIGEN_THROW_X(X) 
+#    define EIGEN_THROW 
 #  else
 #    define EIGEN_THROW_X(X) std::abort()
 #    define EIGEN_THROW std::abort()

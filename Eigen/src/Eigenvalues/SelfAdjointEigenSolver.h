@@ -354,7 +354,7 @@ template<typename _MatrixType> class SelfAdjointEigenSolver
     static const int m_maxIterations = 30;
 
   protected:
-    static void check_template_parameters()
+    static EIGEN_DEVICE_FUNC void check_template_parameters()
     {
       EIGEN_STATIC_ASSERT_NON_INTEGER(Scalar);
     }
