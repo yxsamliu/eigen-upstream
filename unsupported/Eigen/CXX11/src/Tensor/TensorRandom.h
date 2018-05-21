@@ -16,7 +16,7 @@ namespace internal {
 namespace {
 
 EIGEN_DEVICE_FUNC uint64_t get_random_seed() {
-#ifdef EIGEN_CUDA_ARCH
+#if defined(EIGEN_CUDA_ARCH) || defined(EIGEN_HIP_DEVICE_COMPILE)
   // We don't support 3d kernels since we currently only use 1 and
   // 2d kernels.
   assert(threadIdx.z == 0);
@@ -84,9 +84,14 @@ Eigen::half RandomToTypeUniform<Eigen::half>(uint64_t* state, uint64_t stream) {
   Eigen::half result;
   // Generate 10 random bits for the mantissa
   unsigned rnd = PCG_XSH_RS_generator(state, stream);
-  result.x = static_cast<uint16_t>(rnd & 0x3ffu);
+  unsigned short int raw_ushort = static_cast<uint16_t>(rnd & 0x3ffu);
   // Set the exponent
-  result.x |= (static_cast<uint16_t>(15) << 10);
+  raw_ushort |= (static_cast<uint16_t>(15) << 10);
+#if defined(EIGEN_HAS_HIP_FP16) 
+  result.x = __ushort_as_half(raw_ushort);
+#else
+  result.x = raw_ushort;
+#endif
   // Return the final result
   return result - Eigen::half(1.0f);
 }

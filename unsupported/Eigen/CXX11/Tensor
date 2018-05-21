@@ -80,12 +80,15 @@ typedef unsigned __int64 uint64_t;
 #endif
 
 #ifdef EIGEN_USE_GPU
-#include <iostream>
-#include <cuda_runtime.h>
-#if __cplusplus >= 201103L
-#include <atomic>
-#include <unistd.h>
-#endif
+  #include <iostream>
+  #if !defined(EIGEN_HIPCC)
+    // hip_runtime.h is already included in the Eigen/Core file when EIGEN_HIPCC is defined
+    #include <cuda_runtime.h>
+  #endif
+  #if __cplusplus >= 201103L
+    #include <atomic>
+    #include <unistd.h>
+  #endif
 #endif
 
 #include "src/Tensor/TensorMacros.h"
@@ -95,7 +98,11 @@ typedef unsigned __int64 uint64_t;
 #include "src/Tensor/TensorCostModel.h"
 #include "src/Tensor/TensorDeviceDefault.h"
 #include "src/Tensor/TensorDeviceThreadPool.h"
-#include "src/Tensor/TensorDeviceCuda.h"
+#if defined(EIGEN_HIPCC)
+  #include "src/Tensor/TensorDeviceHip.h"
+#else
+  #include "src/Tensor/TensorDeviceCuda.h"
+#endif
 #include "src/Tensor/TensorDeviceSycl.h"
 #include "src/Tensor/TensorIndexList.h"
 #include "src/Tensor/TensorDimensionList.h"
@@ -112,14 +119,22 @@ typedef unsigned __int64 uint64_t;
 #include "src/Tensor/TensorEvaluator.h"
 #include "src/Tensor/TensorExpr.h"
 #include "src/Tensor/TensorReduction.h"
-#include "src/Tensor/TensorReductionCuda.h"
+#if defined(EIGEN_HIPCC)
+  #include "src/Tensor/TensorReductionHip.h"
+#else
+  #include "src/Tensor/TensorReductionCuda.h"
+#endif
 #include "src/Tensor/TensorArgMax.h"
 #include "src/Tensor/TensorConcatenation.h"
 #include "src/Tensor/TensorContractionMapper.h"
 #include "src/Tensor/TensorContractionBlocking.h"
 #include "src/Tensor/TensorContraction.h"
 #include "src/Tensor/TensorContractionThreadPool.h"
-#include "src/Tensor/TensorContractionCuda.h"
+#if defined(EIGEN_HIPCC)
+  #include "src/Tensor/TensorContractionHip.h"
+#else
+  #include "src/Tensor/TensorContractionCuda.h"
+#endif
 #include "src/Tensor/TensorConversion.h"
 #include "src/Tensor/TensorConvolution.h"
 #include "src/Tensor/TensorFFT.h"
