@@ -162,7 +162,7 @@ EIGEN_DEVICE_FUNC inline void* aligned_malloc(std::size_t size)
   #if (EIGEN_DEFAULT_ALIGN_BYTES==0) || EIGEN_MALLOC_ALREADY_ALIGNED
   
     #if defined(EIGEN_HIP_DEVICE_COMPILE)
-    result = aligned_malloc(size);
+    result = aligned_malloc(size);  // This looks like a recursive call....how come this compiles?
     #else
     result = std::malloc(size);
     #endif
@@ -186,7 +186,7 @@ EIGEN_DEVICE_FUNC inline void aligned_free(void *ptr)
   #if (EIGEN_DEFAULT_ALIGN_BYTES==0) || EIGEN_MALLOC_ALREADY_ALIGNED
 
     #if defined(EIGEN_HIP_DEVICE_COMPILE)
-    aligned_free(ptr);
+    aligned_free(ptr);  // This looks like a recursive call....how come this compiles?
     #else
     std::free(ptr);
     #endif

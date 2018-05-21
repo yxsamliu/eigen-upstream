@@ -774,7 +774,6 @@ EIGEN_DEVICE_FUNC
 typename internal::enable_if<(!internal::is_integral<T>::value)&&(!NumTraits<T>::IsComplex),bool>::type
 isfinite_impl(const T& x)
 {
-  //  #ifdef EIGEN_CUDA_ARCH
   #if defined(EIGEN_CUDA_ARCH) || defined(EIGEN_HIP_DEVICE_COMPILE)
     return (::isfinite)(x);
   #elif EIGEN_USE_STD_FPCLASSIFY
@@ -790,7 +789,6 @@ EIGEN_DEVICE_FUNC
 typename internal::enable_if<(!internal::is_integral<T>::value)&&(!NumTraits<T>::IsComplex),bool>::type
 isinf_impl(const T& x)
 {
-  //  #ifdef EIGEN_CUDA_ARCH
   #if defined(EIGEN_CUDA_ARCH) || defined(EIGEN_HIP_DEVICE_COMPILE)
     return (::isinf)(x);
   #elif EIGEN_USE_STD_FPCLASSIFY
@@ -806,7 +804,6 @@ EIGEN_DEVICE_FUNC
 typename internal::enable_if<(!internal::is_integral<T>::value)&&(!NumTraits<T>::IsComplex),bool>::type
 isnan_impl(const T& x)
 {
-  //  #ifdef EIGEN_CUDA_ARCH
   #if defined(EIGEN_CUDA_ARCH) || defined(EIGEN_HIP_DEVICE_COMPILE)
     return (::isnan)(x);
   #elif EIGEN_USE_STD_FPCLASSIFY

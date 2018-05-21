@@ -158,8 +158,8 @@ void test_hip_basic()
   CALL_SUBTEST( run_and_compare_to_hip(redux<Array4f>(), nthreads, in, out) );
   CALL_SUBTEST( run_and_compare_to_hip(redux<Matrix3f>(), nthreads, in, out) );
   
-  // CALL_SUBTEST( run_and_compare_to_hip(prod_test<Matrix3f,Matrix3f>(), nthreads, in, out) );
-  // CALL_SUBTEST( run_and_compare_to_hip(prod_test<Matrix4f,Vector4f>(), nthreads, in, out) );
+  CALL_SUBTEST( run_and_compare_to_hip(prod_test<Matrix3f,Matrix3f>(), nthreads, in, out) );
+  CALL_SUBTEST( run_and_compare_to_hip(prod_test<Matrix4f,Vector4f>(), nthreads, in, out) );
   
   CALL_SUBTEST( run_and_compare_to_hip(diagonal<Matrix3f,Vector3f>(), nthreads, in, out) );
   CALL_SUBTEST( run_and_compare_to_hip(diagonal<Matrix4f,Vector4f>(), nthreads, in, out) );
