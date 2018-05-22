@@ -67,11 +67,17 @@
 // protected by parenthesis against macro expansion, the min()/max() macros
 // are defined here and any not-parenthesized min/max call will cause a
 // compiler error.
-#define min(A,B) please_protect_your_min_with_parentheses
-#define max(A,B) please_protect_your_max_with_parentheses
-#define isnan(X) please_protect_your_isnan_with_parentheses
-#define isinf(X) please_protect_your_isinf_with_parentheses
-#define isfinite(X) please_protect_your_isfinite_with_parentheses
+#if !defined(__HIPCC__)
+  // HIP headers include the <thread> header which contains not-parenthesized
+  // calls to "max", triggering the following check and causing the compile to fail
+  // so disabling the following checks for HIP
+  #define min(A,B) please_protect_your_min_with_parentheses
+  #define max(A,B) please_protect_your_max_with_parentheses
+  #define isnan(X) please_protect_your_isnan_with_parentheses
+  #define isinf(X) please_protect_your_isinf_with_parentheses
+  #define isfinite(X) please_protect_your_isfinite_with_parentheses
+#endif
+
 #ifdef M_PI
 #undef M_PI
 #endif
@@ -154,7 +160,7 @@ namespace Eigen
 
 #define EIGEN_DEFAULT_IO_FORMAT IOFormat(4, 0, "  ", "\n", "", "", "", "")
 
-#if (defined(_CPPUNWIND) || defined(__EXCEPTIONS)) && (!defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__))
+#if (defined(_CPPUNWIND) || defined(__EXCEPTIONS)) && !defined(__CUDA_ARCH__) && !defined(__HIP_DEVICE_COMPILE__)
   #define EIGEN_EXCEPTIONS
 #endif
 

@@ -12,7 +12,7 @@
 #define EIGEN_CXX11_TENSOR_TENSOR_REDUCTION_HIP_H
 
 #ifdef __HIP_DEVICE_COMPILE__
-#include "Eigen/src/Core/arch/HIP/hcc/intrinsics.h"
+#include "Eigen/src/Core/arch/HIP/hcc/math_constants.h"
 #endif
 
 #ifdef __NVCC__

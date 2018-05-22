@@ -27,11 +27,6 @@
   #define EIGEN_HIPCC __HIPCC__
 #endif
 
-#if defined(__HIP_DEVICE_COMPILE__) && !defined(EIGEN_NO_HIP)
-  // analogous to EIGEN_CUDA_ARCH, but for HIP
-  #define EIGEN_HIP_DEVICE_COMPILE __HIP_DEVICE_COMPILE__
-#endif
-
 // NVCC is not supported as the target platform for HIPCC
 // Note that this also makes EIGEN_CUDACC and EIGEN_HIPCC mutually exclusive
 #if defined(__NVCC__) && defined(__HIPCC__)
@@ -85,6 +80,14 @@
     // works properly on the device side
     #include <hip/hip_runtime.h>
     
+   #if defined(__HIP_DEVICE_COMPILE__) && !defined(EIGEN_NO_HIP)
+     // analogous to EIGEN_CUDA_ARCH, but for HIP
+     #define EIGEN_HIP_DEVICE_COMPILE __HIP_DEVICE_COMPILE__
+     // Note this check needs to come after we include hip_runtime.h since
+     // hip_runtime.h includes hip_common,h which in turn has the define
+     // for __HIP_DEVICE_COMPILE__
+   #endif
+
   #else
     #define EIGEN_DEVICE_FUNC
   #endif
