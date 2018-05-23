@@ -495,7 +495,11 @@ struct TensorEvaluator<const TensorReductionOp<Op, Dims, ArgType, MakePointer_>,
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Dimensions& dimensions() const { return m_dimensions; }
 
-  EIGEN_STRONG_INLINE EIGEN_DEVICE_FUNC bool evalSubExprsIfNeeded(typename MakePointer_<CoeffReturnType>::Type data) {
+  EIGEN_STRONG_INLINE
+    #if !defined(EIGEN_HIPCC)
+    EIGEN_DEVICE_FUNC
+    #endif
+    bool evalSubExprsIfNeeded(typename MakePointer_<CoeffReturnType>::Type data) {
     m_impl.evalSubExprsIfNeeded(NULL);
 
     // Use the FullReducer if possible.
@@ -774,9 +778,17 @@ struct TensorEvaluator<const TensorReductionOp<Op, Dims, ArgType, MakePointer_>,
   // Indexed by reduced dimensions.
   array<Index, NumReducedDims> m_reducedDims;
 
+#if defined(EIGEN_HIPCC)
+ public:
+#endif
+  
   // Evaluator for the input expression.
   TensorEvaluator<ArgType, Device> m_impl;
 
+#if defined(EIGEN_HIPCC)
+ private:
+#endif
+  
   // Operation to apply for computing the reduction.
   Op m_reducer;
 

@@ -317,307 +317,308 @@ void test_hip_contraction()
   hipFree(d_t_result);
 }
 
-template<int DataLayout>
-void test_hip_convolution_1d()
-{
-  Tensor<float, 4, DataLayout> input(74,37,11,137);
-  Tensor<float, 1, DataLayout> kernel(4);
-  Tensor<float, 4, DataLayout> out(74,34,11,137);
-  input = input.constant(10.0f) + input.random();
-  kernel = kernel.constant(7.0f) + kernel.random();
 
-  std::size_t input_bytes = input.size() * sizeof(float);
-  std::size_t kernel_bytes = kernel.size() * sizeof(float);
-  std::size_t out_bytes = out.size() * sizeof(float);
+// template<int DataLayout>
+// void test_hip_convolution_1d()
+// {
+//   Tensor<float, 4, DataLayout> input(74,37,11,137);
+//   Tensor<float, 1, DataLayout> kernel(4);
+//   Tensor<float, 4, DataLayout> out(74,34,11,137);
+//   input = input.constant(10.0f) + input.random();
+//   kernel = kernel.constant(7.0f) + kernel.random();
 
-  float* d_input;
-  float* d_kernel;
-  float* d_out;
-  hipMalloc((void**)(&d_input), input_bytes);
-  hipMalloc((void**)(&d_kernel), kernel_bytes);
-  hipMalloc((void**)(&d_out), out_bytes);
+//   std::size_t input_bytes = input.size() * sizeof(float);
+//   std::size_t kernel_bytes = kernel.size() * sizeof(float);
+//   std::size_t out_bytes = out.size() * sizeof(float);
 
-  hipMemcpy(d_input, input.data(), input_bytes, hipMemcpyHostToDevice);
-  hipMemcpy(d_kernel, kernel.data(), kernel_bytes, hipMemcpyHostToDevice);
+//   float* d_input;
+//   float* d_kernel;
+//   float* d_out;
+//   hipMalloc((void**)(&d_input), input_bytes);
+//   hipMalloc((void**)(&d_kernel), kernel_bytes);
+//   hipMalloc((void**)(&d_out), out_bytes);
 
-  Eigen::HipStreamDevice stream;
-  Eigen::GpuDevice gpu_device(&stream);
+//   hipMemcpy(d_input, input.data(), input_bytes, hipMemcpyHostToDevice);
+//   hipMemcpy(d_kernel, kernel.data(), kernel_bytes, hipMemcpyHostToDevice);
 
-  Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout> > gpu_input(d_input, 74,37,11,137);
-  Eigen::TensorMap<Eigen::Tensor<float, 1, DataLayout> > gpu_kernel(d_kernel, 4);
-  Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout> > gpu_out(d_out, 74,34,11,137);
+//   Eigen::HipStreamDevice stream;
+//   Eigen::GpuDevice gpu_device(&stream);
 
-  Eigen::array<Eigen::DenseIndex, 1> dims{1};
-  gpu_out.device(gpu_device) = gpu_input.convolve(gpu_kernel, dims);
+//   Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout> > gpu_input(d_input, 74,37,11,137);
+//   Eigen::TensorMap<Eigen::Tensor<float, 1, DataLayout> > gpu_kernel(d_kernel, 4);
+//   Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout> > gpu_out(d_out, 74,34,11,137);
 
-  assert(hipMemcpyAsync(out.data(), d_out, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
-  assert(hipStreamSynchronize(gpu_device.stream()) == hipSuccess);
+//   Eigen::array<Eigen::DenseIndex, 1> dims{1};
+//   gpu_out.device(gpu_device) = gpu_input.convolve(gpu_kernel, dims);
 
-  for (int i = 0; i < 74; ++i) {
-    for (int j = 0; j < 34; ++j) {
-      for (int k = 0; k < 11; ++k) {
-        for (int l = 0; l < 137; ++l) {
-          const float result = out(i,j,k,l);
-          const float expected = input(i,j+0,k,l) * kernel(0) + input(i,j+1,k,l) * kernel(1) +
-                                 input(i,j+2,k,l) * kernel(2) + input(i,j+3,k,l) * kernel(3);
-          VERIFY_IS_APPROX(result, expected);
-        }
-      }
-    }
-  }
+//   assert(hipMemcpyAsync(out.data(), d_out, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
+//   assert(hipStreamSynchronize(gpu_device.stream()) == hipSuccess);
 
-  hipFree(d_input);
-  hipFree(d_kernel);
-  hipFree(d_out);
-}
+//   for (int i = 0; i < 74; ++i) {
+//     for (int j = 0; j < 34; ++j) {
+//       for (int k = 0; k < 11; ++k) {
+//         for (int l = 0; l < 137; ++l) {
+//           const float result = out(i,j,k,l);
+//           const float expected = input(i,j+0,k,l) * kernel(0) + input(i,j+1,k,l) * kernel(1) +
+//                                  input(i,j+2,k,l) * kernel(2) + input(i,j+3,k,l) * kernel(3);
+//           VERIFY_IS_APPROX(result, expected);
+//         }
+//       }
+//     }
+//   }
 
-void test_hip_convolution_inner_dim_col_major_1d()
-{
-  Tensor<float, 4, ColMajor> input(74,9,11,7);
-  Tensor<float, 1, ColMajor> kernel(4);
-  Tensor<float, 4, ColMajor> out(71,9,11,7);
-  input = input.constant(10.0f) + input.random();
-  kernel = kernel.constant(7.0f) + kernel.random();
+//   hipFree(d_input);
+//   hipFree(d_kernel);
+//   hipFree(d_out);
+// }
 
-  std::size_t input_bytes = input.size() * sizeof(float);
-  std::size_t kernel_bytes = kernel.size() * sizeof(float);
-  std::size_t out_bytes = out.size() * sizeof(float);
+// void test_hip_convolution_inner_dim_col_major_1d()
+// {
+//   Tensor<float, 4, ColMajor> input(74,9,11,7);
+//   Tensor<float, 1, ColMajor> kernel(4);
+//   Tensor<float, 4, ColMajor> out(71,9,11,7);
+//   input = input.constant(10.0f) + input.random();
+//   kernel = kernel.constant(7.0f) + kernel.random();
 
-  float* d_input;
-  float* d_kernel;
-  float* d_out;
-  hipMalloc((void**)(&d_input), input_bytes);
-  hipMalloc((void**)(&d_kernel), kernel_bytes);
-  hipMalloc((void**)(&d_out), out_bytes);
+//   std::size_t input_bytes = input.size() * sizeof(float);
+//   std::size_t kernel_bytes = kernel.size() * sizeof(float);
+//   std::size_t out_bytes = out.size() * sizeof(float);
 
-  hipMemcpy(d_input, input.data(), input_bytes, hipMemcpyHostToDevice);
-  hipMemcpy(d_kernel, kernel.data(), kernel_bytes, hipMemcpyHostToDevice);
+//   float* d_input;
+//   float* d_kernel;
+//   float* d_out;
+//   hipMalloc((void**)(&d_input), input_bytes);
+//   hipMalloc((void**)(&d_kernel), kernel_bytes);
+//   hipMalloc((void**)(&d_out), out_bytes);
 
-  Eigen::HipStreamDevice stream;
-  Eigen::GpuDevice gpu_device(&stream);
+//   hipMemcpy(d_input, input.data(), input_bytes, hipMemcpyHostToDevice);
+//   hipMemcpy(d_kernel, kernel.data(), kernel_bytes, hipMemcpyHostToDevice);
 
-  Eigen::TensorMap<Eigen::Tensor<float, 4, ColMajor> > gpu_input(d_input,74,9,11,7);
-  Eigen::TensorMap<Eigen::Tensor<float, 1, ColMajor> > gpu_kernel(d_kernel,4);
-  Eigen::TensorMap<Eigen::Tensor<float, 4, ColMajor> > gpu_out(d_out,71,9,11,7);
+//   Eigen::HipStreamDevice stream;
+//   Eigen::GpuDevice gpu_device(&stream);
 
-  Eigen::array<Eigen::DenseIndex, 1> dims{0};
-  gpu_out.device(gpu_device) = gpu_input.convolve(gpu_kernel, dims);
+//   Eigen::TensorMap<Eigen::Tensor<float, 4, ColMajor> > gpu_input(d_input,74,9,11,7);
+//   Eigen::TensorMap<Eigen::Tensor<float, 1, ColMajor> > gpu_kernel(d_kernel,4);
+//   Eigen::TensorMap<Eigen::Tensor<float, 4, ColMajor> > gpu_out(d_out,71,9,11,7);
 
-  assert(hipMemcpyAsync(out.data(), d_out, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
-  assert(hipStreamSynchronize(gpu_device.stream()) == hipSuccess);
+//   Eigen::array<Eigen::DenseIndex, 1> dims{0};
+//   gpu_out.device(gpu_device) = gpu_input.convolve(gpu_kernel, dims);
 
-  for (int i = 0; i < 71; ++i) {
-    for (int j = 0; j < 9; ++j) {
-      for (int k = 0; k < 11; ++k) {
-        for (int l = 0; l < 7; ++l) {
-          const float result = out(i,j,k,l);
-          const float expected = input(i+0,j,k,l) * kernel(0) + input(i+1,j,k,l) * kernel(1) +
-                                 input(i+2,j,k,l) * kernel(2) + input(i+3,j,k,l) * kernel(3);
-          VERIFY_IS_APPROX(result, expected);
-        }
-      }
-    }
-  }
+//   assert(hipMemcpyAsync(out.data(), d_out, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
+//   assert(hipStreamSynchronize(gpu_device.stream()) == hipSuccess);
 
-  hipFree(d_input);
-  hipFree(d_kernel);
-  hipFree(d_out);
-}
+//   for (int i = 0; i < 71; ++i) {
+//     for (int j = 0; j < 9; ++j) {
+//       for (int k = 0; k < 11; ++k) {
+//         for (int l = 0; l < 7; ++l) {
+//           const float result = out(i,j,k,l);
+//           const float expected = input(i+0,j,k,l) * kernel(0) + input(i+1,j,k,l) * kernel(1) +
+//                                  input(i+2,j,k,l) * kernel(2) + input(i+3,j,k,l) * kernel(3);
+//           VERIFY_IS_APPROX(result, expected);
+//         }
+//       }
+//     }
+//   }
 
-void test_hip_convolution_inner_dim_row_major_1d()
-{
-  Tensor<float, 4, RowMajor> input(7,9,11,74);
-  Tensor<float, 1, RowMajor> kernel(4);
-  Tensor<float, 4, RowMajor> out(7,9,11,71);
-  input = input.constant(10.0f) + input.random();
-  kernel = kernel.constant(7.0f) + kernel.random();
+//   hipFree(d_input);
+//   hipFree(d_kernel);
+//   hipFree(d_out);
+// }
 
-  std::size_t input_bytes = input.size() * sizeof(float);
-  std::size_t kernel_bytes = kernel.size() * sizeof(float);
-  std::size_t out_bytes = out.size() * sizeof(float);
+// void test_hip_convolution_inner_dim_row_major_1d()
+// {
+//   Tensor<float, 4, RowMajor> input(7,9,11,74);
+//   Tensor<float, 1, RowMajor> kernel(4);
+//   Tensor<float, 4, RowMajor> out(7,9,11,71);
+//   input = input.constant(10.0f) + input.random();
+//   kernel = kernel.constant(7.0f) + kernel.random();
 
-  float* d_input;
-  float* d_kernel;
-  float* d_out;
-  hipMalloc((void**)(&d_input), input_bytes);
-  hipMalloc((void**)(&d_kernel), kernel_bytes);
-  hipMalloc((void**)(&d_out), out_bytes);
+//   std::size_t input_bytes = input.size() * sizeof(float);
+//   std::size_t kernel_bytes = kernel.size() * sizeof(float);
+//   std::size_t out_bytes = out.size() * sizeof(float);
 
-  hipMemcpy(d_input, input.data(), input_bytes, hipMemcpyHostToDevice);
-  hipMemcpy(d_kernel, kernel.data(), kernel_bytes, hipMemcpyHostToDevice);
+//   float* d_input;
+//   float* d_kernel;
+//   float* d_out;
+//   hipMalloc((void**)(&d_input), input_bytes);
+//   hipMalloc((void**)(&d_kernel), kernel_bytes);
+//   hipMalloc((void**)(&d_out), out_bytes);
 
-  Eigen::HipStreamDevice stream;
-  Eigen::GpuDevice gpu_device(&stream);
+//   hipMemcpy(d_input, input.data(), input_bytes, hipMemcpyHostToDevice);
+//   hipMemcpy(d_kernel, kernel.data(), kernel_bytes, hipMemcpyHostToDevice);
 
-  Eigen::TensorMap<Eigen::Tensor<float, 4, RowMajor> > gpu_input(d_input, 7,9,11,74);
-  Eigen::TensorMap<Eigen::Tensor<float, 1, RowMajor> > gpu_kernel(d_kernel, 4);
-  Eigen::TensorMap<Eigen::Tensor<float, 4, RowMajor> > gpu_out(d_out, 7,9,11,71);
+//   Eigen::HipStreamDevice stream;
+//   Eigen::GpuDevice gpu_device(&stream);
 
-  Eigen::array<Eigen::DenseIndex, 1> dims{3};
-  gpu_out.device(gpu_device) = gpu_input.convolve(gpu_kernel, dims);
+//   Eigen::TensorMap<Eigen::Tensor<float, 4, RowMajor> > gpu_input(d_input, 7,9,11,74);
+//   Eigen::TensorMap<Eigen::Tensor<float, 1, RowMajor> > gpu_kernel(d_kernel, 4);
+//   Eigen::TensorMap<Eigen::Tensor<float, 4, RowMajor> > gpu_out(d_out, 7,9,11,71);
 
-  assert(hipMemcpyAsync(out.data(), d_out, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
-  assert(hipStreamSynchronize(gpu_device.stream()) == hipSuccess);
+//   Eigen::array<Eigen::DenseIndex, 1> dims{3};
+//   gpu_out.device(gpu_device) = gpu_input.convolve(gpu_kernel, dims);
 
-  for (int i = 0; i < 7; ++i) {
-    for (int j = 0; j < 9; ++j) {
-      for (int k = 0; k < 11; ++k) {
-        for (int l = 0; l < 71; ++l) {
-          const float result = out(i,j,k,l);
-          const float expected = input(i,j,k,l+0) * kernel(0) + input(i,j,k,l+1) * kernel(1) +
-                                 input(i,j,k,l+2) * kernel(2) + input(i,j,k,l+3) * kernel(3);
-          VERIFY_IS_APPROX(result, expected);
-        }
-      }
-    }
-  }
+//   assert(hipMemcpyAsync(out.data(), d_out, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
+//   assert(hipStreamSynchronize(gpu_device.stream()) == hipSuccess);
 
-  hipFree(d_input);
-  hipFree(d_kernel);
-  hipFree(d_out);
-}
+//   for (int i = 0; i < 7; ++i) {
+//     for (int j = 0; j < 9; ++j) {
+//       for (int k = 0; k < 11; ++k) {
+//         for (int l = 0; l < 71; ++l) {
+//           const float result = out(i,j,k,l);
+//           const float expected = input(i,j,k,l+0) * kernel(0) + input(i,j,k,l+1) * kernel(1) +
+//                                  input(i,j,k,l+2) * kernel(2) + input(i,j,k,l+3) * kernel(3);
+//           VERIFY_IS_APPROX(result, expected);
+//         }
+//       }
+//     }
+//   }
 
-template<int DataLayout>
-void test_hip_convolution_2d()
-{
-  Tensor<float, 4, DataLayout> input(74,37,11,137);
-  Tensor<float, 2, DataLayout> kernel(3,4);
-  Tensor<float, 4, DataLayout> out(74,35,8,137);
-  input = input.constant(10.0f) + input.random();
-  kernel = kernel.constant(7.0f) + kernel.random();
+//   hipFree(d_input);
+//   hipFree(d_kernel);
+//   hipFree(d_out);
+// }
 
-  std::size_t input_bytes = input.size() * sizeof(float);
-  std::size_t kernel_bytes = kernel.size() * sizeof(float);
-  std::size_t out_bytes = out.size() * sizeof(float);
+// template<int DataLayout>
+// void test_hip_convolution_2d()
+// {
+//   Tensor<float, 4, DataLayout> input(74,37,11,137);
+//   Tensor<float, 2, DataLayout> kernel(3,4);
+//   Tensor<float, 4, DataLayout> out(74,35,8,137);
+//   input = input.constant(10.0f) + input.random();
+//   kernel = kernel.constant(7.0f) + kernel.random();
 
-  float* d_input;
-  float* d_kernel;
-  float* d_out;
-  hipMalloc((void**)(&d_input), input_bytes);
-  hipMalloc((void**)(&d_kernel), kernel_bytes);
-  hipMalloc((void**)(&d_out), out_bytes);
+//   std::size_t input_bytes = input.size() * sizeof(float);
+//   std::size_t kernel_bytes = kernel.size() * sizeof(float);
+//   std::size_t out_bytes = out.size() * sizeof(float);
 
-  hipMemcpy(d_input, input.data(), input_bytes, hipMemcpyHostToDevice);
-  hipMemcpy(d_kernel, kernel.data(), kernel_bytes, hipMemcpyHostToDevice);
+//   float* d_input;
+//   float* d_kernel;
+//   float* d_out;
+//   hipMalloc((void**)(&d_input), input_bytes);
+//   hipMalloc((void**)(&d_kernel), kernel_bytes);
+//   hipMalloc((void**)(&d_out), out_bytes);
 
-  Eigen::HipStreamDevice stream;
-  Eigen::GpuDevice gpu_device(&stream);
+//   hipMemcpy(d_input, input.data(), input_bytes, hipMemcpyHostToDevice);
+//   hipMemcpy(d_kernel, kernel.data(), kernel_bytes, hipMemcpyHostToDevice);
 
-  Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout> > gpu_input(d_input,74,37,11,137);
-  Eigen::TensorMap<Eigen::Tensor<float, 2, DataLayout> > gpu_kernel(d_kernel,3,4);
-  Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout> > gpu_out(d_out,74,35,8,137);
+//   Eigen::HipStreamDevice stream;
+//   Eigen::GpuDevice gpu_device(&stream);
 
-  Eigen::array<Eigen::DenseIndex, 2> dims{1,2};
-  gpu_out.device(gpu_device) = gpu_input.convolve(gpu_kernel, dims);
+//   Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout> > gpu_input(d_input,74,37,11,137);
+//   Eigen::TensorMap<Eigen::Tensor<float, 2, DataLayout> > gpu_kernel(d_kernel,3,4);
+//   Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout> > gpu_out(d_out,74,35,8,137);
 
-  assert(hipMemcpyAsync(out.data(), d_out, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
-  assert(hipStreamSynchronize(gpu_device.stream()) == hipSuccess);
+//   Eigen::array<Eigen::DenseIndex, 2> dims{1,2};
+//   gpu_out.device(gpu_device) = gpu_input.convolve(gpu_kernel, dims);
 
-  for (int i = 0; i < 74; ++i) {
-    for (int j = 0; j < 35; ++j) {
-      for (int k = 0; k < 8; ++k) {
-        for (int l = 0; l < 137; ++l) {
-          const float result = out(i,j,k,l);
-          const float expected = input(i,j+0,k+0,l) * kernel(0,0) +
-                                 input(i,j+1,k+0,l) * kernel(1,0) +
-                                 input(i,j+2,k+0,l) * kernel(2,0) +
-                                 input(i,j+0,k+1,l) * kernel(0,1) +
-                                 input(i,j+1,k+1,l) * kernel(1,1) +
-                                 input(i,j+2,k+1,l) * kernel(2,1) +
-                                 input(i,j+0,k+2,l) * kernel(0,2) +
-                                 input(i,j+1,k+2,l) * kernel(1,2) +
-                                 input(i,j+2,k+2,l) * kernel(2,2) +
-                                 input(i,j+0,k+3,l) * kernel(0,3) +
-                                 input(i,j+1,k+3,l) * kernel(1,3) +
-                                 input(i,j+2,k+3,l) * kernel(2,3);
-          VERIFY_IS_APPROX(result, expected);
-        }
-      }
-    }
-  }
+//   assert(hipMemcpyAsync(out.data(), d_out, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
+//   assert(hipStreamSynchronize(gpu_device.stream()) == hipSuccess);
 
-  hipFree(d_input);
-  hipFree(d_kernel);
-  hipFree(d_out);
-}
+//   for (int i = 0; i < 74; ++i) {
+//     for (int j = 0; j < 35; ++j) {
+//       for (int k = 0; k < 8; ++k) {
+//         for (int l = 0; l < 137; ++l) {
+//           const float result = out(i,j,k,l);
+//           const float expected = input(i,j+0,k+0,l) * kernel(0,0) +
+//                                  input(i,j+1,k+0,l) * kernel(1,0) +
+//                                  input(i,j+2,k+0,l) * kernel(2,0) +
+//                                  input(i,j+0,k+1,l) * kernel(0,1) +
+//                                  input(i,j+1,k+1,l) * kernel(1,1) +
+//                                  input(i,j+2,k+1,l) * kernel(2,1) +
+//                                  input(i,j+0,k+2,l) * kernel(0,2) +
+//                                  input(i,j+1,k+2,l) * kernel(1,2) +
+//                                  input(i,j+2,k+2,l) * kernel(2,2) +
+//                                  input(i,j+0,k+3,l) * kernel(0,3) +
+//                                  input(i,j+1,k+3,l) * kernel(1,3) +
+//                                  input(i,j+2,k+3,l) * kernel(2,3);
+//           VERIFY_IS_APPROX(result, expected);
+//         }
+//       }
+//     }
+//   }
 
-template<int DataLayout>
-void test_hip_convolution_3d()
-{
-  Tensor<float, 5, DataLayout> input(Eigen::array<Eigen::DenseIndex, 5>{74,37,11,137,17});
-  Tensor<float, 3, DataLayout> kernel(3,4,2);
-  Tensor<float, 5, DataLayout> out(Eigen::array<Eigen::DenseIndex, 5>{74,35,8,136,17});
-  input = input.constant(10.0f) + input.random();
-  kernel = kernel.constant(7.0f) + kernel.random();
+//   hipFree(d_input);
+//   hipFree(d_kernel);
+//   hipFree(d_out);
+// }
 
-  std::size_t input_bytes = input.size() * sizeof(float);
-  std::size_t kernel_bytes = kernel.size() * sizeof(float);
-  std::size_t out_bytes = out.size() * sizeof(float);
+// template<int DataLayout>
+// void test_hip_convolution_3d()
+// {
+//   Tensor<float, 5, DataLayout> input(Eigen::array<Eigen::DenseIndex, 5>{74,37,11,137,17});
+//   Tensor<float, 3, DataLayout> kernel(3,4,2);
+//   Tensor<float, 5, DataLayout> out(Eigen::array<Eigen::DenseIndex, 5>{74,35,8,136,17});
+//   input = input.constant(10.0f) + input.random();
+//   kernel = kernel.constant(7.0f) + kernel.random();
 
-  float* d_input;
-  float* d_kernel;
-  float* d_out;
-  hipMalloc((void**)(&d_input), input_bytes);
-  hipMalloc((void**)(&d_kernel), kernel_bytes);
-  hipMalloc((void**)(&d_out), out_bytes);
+//   std::size_t input_bytes = input.size() * sizeof(float);
+//   std::size_t kernel_bytes = kernel.size() * sizeof(float);
+//   std::size_t out_bytes = out.size() * sizeof(float);
 
-  hipMemcpy(d_input, input.data(), input_bytes, hipMemcpyHostToDevice);
-  hipMemcpy(d_kernel, kernel.data(), kernel_bytes, hipMemcpyHostToDevice);
+//   float* d_input;
+//   float* d_kernel;
+//   float* d_out;
+//   hipMalloc((void**)(&d_input), input_bytes);
+//   hipMalloc((void**)(&d_kernel), kernel_bytes);
+//   hipMalloc((void**)(&d_out), out_bytes);
 
-  Eigen::HipStreamDevice stream;    
-  Eigen::GpuDevice gpu_device(&stream);
+//   hipMemcpy(d_input, input.data(), input_bytes, hipMemcpyHostToDevice);
+//   hipMemcpy(d_kernel, kernel.data(), kernel_bytes, hipMemcpyHostToDevice);
 
-  Eigen::TensorMap<Eigen::Tensor<float, 5, DataLayout> > gpu_input(d_input,74,37,11,137,17);
-  Eigen::TensorMap<Eigen::Tensor<float, 3, DataLayout> > gpu_kernel(d_kernel,3,4,2);
-  Eigen::TensorMap<Eigen::Tensor<float, 5, DataLayout> > gpu_out(d_out,74,35,8,136,17);
+//   Eigen::HipStreamDevice stream;    
+//   Eigen::GpuDevice gpu_device(&stream);
 
-  Eigen::array<Eigen::DenseIndex, 3> dims{1,2,3};
-  gpu_out.device(gpu_device) = gpu_input.convolve(gpu_kernel, dims);
+//   Eigen::TensorMap<Eigen::Tensor<float, 5, DataLayout> > gpu_input(d_input,74,37,11,137,17);
+//   Eigen::TensorMap<Eigen::Tensor<float, 3, DataLayout> > gpu_kernel(d_kernel,3,4,2);
+//   Eigen::TensorMap<Eigen::Tensor<float, 5, DataLayout> > gpu_out(d_out,74,35,8,136,17);
 
-  assert(hipMemcpyAsync(out.data(), d_out, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
-  assert(hipStreamSynchronize(gpu_device.stream()) == hipSuccess);
+//   Eigen::array<Eigen::DenseIndex, 3> dims{1,2,3};
+//   gpu_out.device(gpu_device) = gpu_input.convolve(gpu_kernel, dims);
 
-  for (int i = 0; i < 74; ++i) {
-    for (int j = 0; j < 35; ++j) {
-      for (int k = 0; k < 8; ++k) {
-        for (int l = 0; l < 136; ++l) {
-          for (int m = 0; m < 17; ++m) {
-            const float result = out(i,j,k,l,m);
-            const float expected = input(i,j+0,k+0,l+0,m) * kernel(0,0,0) +
-                                   input(i,j+1,k+0,l+0,m) * kernel(1,0,0) +
-                                   input(i,j+2,k+0,l+0,m) * kernel(2,0,0) +
-                                   input(i,j+0,k+1,l+0,m) * kernel(0,1,0) +
-                                   input(i,j+1,k+1,l+0,m) * kernel(1,1,0) +
-                                   input(i,j+2,k+1,l+0,m) * kernel(2,1,0) +
-                                   input(i,j+0,k+2,l+0,m) * kernel(0,2,0) +
-                                   input(i,j+1,k+2,l+0,m) * kernel(1,2,0) +
-                                   input(i,j+2,k+2,l+0,m) * kernel(2,2,0) +
-                                   input(i,j+0,k+3,l+0,m) * kernel(0,3,0) +
-                                   input(i,j+1,k+3,l+0,m) * kernel(1,3,0) +
-                                   input(i,j+2,k+3,l+0,m) * kernel(2,3,0) +
-                                   input(i,j+0,k+0,l+1,m) * kernel(0,0,1) +
-                                   input(i,j+1,k+0,l+1,m) * kernel(1,0,1) +
-                                   input(i,j+2,k+0,l+1,m) * kernel(2,0,1) +
-                                   input(i,j+0,k+1,l+1,m) * kernel(0,1,1) +
-                                   input(i,j+1,k+1,l+1,m) * kernel(1,1,1) +
-                                   input(i,j+2,k+1,l+1,m) * kernel(2,1,1) +
-                                   input(i,j+0,k+2,l+1,m) * kernel(0,2,1) +
-                                   input(i,j+1,k+2,l+1,m) * kernel(1,2,1) +
-                                   input(i,j+2,k+2,l+1,m) * kernel(2,2,1) +
-                                   input(i,j+0,k+3,l+1,m) * kernel(0,3,1) +
-                                   input(i,j+1,k+3,l+1,m) * kernel(1,3,1) +
-                                   input(i,j+2,k+3,l+1,m) * kernel(2,3,1);
-            VERIFY_IS_APPROX(result, expected);
-          }
-        }
-      }
-    }
-  }
+//   assert(hipMemcpyAsync(out.data(), d_out, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
+//   assert(hipStreamSynchronize(gpu_device.stream()) == hipSuccess);
 
-  hipFree(d_input);
-  hipFree(d_kernel);
-  hipFree(d_out);
-}
+//   for (int i = 0; i < 74; ++i) {
+//     for (int j = 0; j < 35; ++j) {
+//       for (int k = 0; k < 8; ++k) {
+//         for (int l = 0; l < 136; ++l) {
+//           for (int m = 0; m < 17; ++m) {
+//             const float result = out(i,j,k,l,m);
+//             const float expected = input(i,j+0,k+0,l+0,m) * kernel(0,0,0) +
+//                                    input(i,j+1,k+0,l+0,m) * kernel(1,0,0) +
+//                                    input(i,j+2,k+0,l+0,m) * kernel(2,0,0) +
+//                                    input(i,j+0,k+1,l+0,m) * kernel(0,1,0) +
+//                                    input(i,j+1,k+1,l+0,m) * kernel(1,1,0) +
+//                                    input(i,j+2,k+1,l+0,m) * kernel(2,1,0) +
+//                                    input(i,j+0,k+2,l+0,m) * kernel(0,2,0) +
+//                                    input(i,j+1,k+2,l+0,m) * kernel(1,2,0) +
+//                                    input(i,j+2,k+2,l+0,m) * kernel(2,2,0) +
+//                                    input(i,j+0,k+3,l+0,m) * kernel(0,3,0) +
+//                                    input(i,j+1,k+3,l+0,m) * kernel(1,3,0) +
+//                                    input(i,j+2,k+3,l+0,m) * kernel(2,3,0) +
+//                                    input(i,j+0,k+0,l+1,m) * kernel(0,0,1) +
+//                                    input(i,j+1,k+0,l+1,m) * kernel(1,0,1) +
+//                                    input(i,j+2,k+0,l+1,m) * kernel(2,0,1) +
+//                                    input(i,j+0,k+1,l+1,m) * kernel(0,1,1) +
+//                                    input(i,j+1,k+1,l+1,m) * kernel(1,1,1) +
+//                                    input(i,j+2,k+1,l+1,m) * kernel(2,1,1) +
+//                                    input(i,j+0,k+2,l+1,m) * kernel(0,2,1) +
+//                                    input(i,j+1,k+2,l+1,m) * kernel(1,2,1) +
+//                                    input(i,j+2,k+2,l+1,m) * kernel(2,2,1) +
+//                                    input(i,j+0,k+3,l+1,m) * kernel(0,3,1) +
+//                                    input(i,j+1,k+3,l+1,m) * kernel(1,3,1) +
+//                                    input(i,j+2,k+3,l+1,m) * kernel(2,3,1);
+//             VERIFY_IS_APPROX(result, expected);
+//           }
+//         }
+//       }
+//     }
+//   }
+
+//   hipFree(d_input);
+//   hipFree(d_kernel);
+//   hipFree(d_out);
+// }
 
 
 template <typename Scalar>
@@ -1223,14 +1224,14 @@ void test_cxx11_tensor_hip()
   CALL_SUBTEST_1(test_hip_reduction());
   CALL_SUBTEST_2(test_hip_contraction<ColMajor>());
   CALL_SUBTEST_2(test_hip_contraction<RowMajor>());
-  CALL_SUBTEST_3(test_hip_convolution_1d<ColMajor>());
-  CALL_SUBTEST_3(test_hip_convolution_1d<RowMajor>());
-  CALL_SUBTEST_3(test_hip_convolution_inner_dim_col_major_1d());
-  CALL_SUBTEST_3(test_hip_convolution_inner_dim_row_major_1d());
-  CALL_SUBTEST_3(test_hip_convolution_2d<ColMajor>());
-  CALL_SUBTEST_3(test_hip_convolution_2d<RowMajor>());
-  CALL_SUBTEST_3(test_hip_convolution_3d<ColMajor>());
-  CALL_SUBTEST_3(test_hip_convolution_3d<RowMajor>());
+  // CALL_SUBTEST_3(test_hip_convolution_1d<ColMajor>());
+  // CALL_SUBTEST_3(test_hip_convolution_1d<RowMajor>());
+  // CALL_SUBTEST_3(test_hip_convolution_inner_dim_col_major_1d());
+  // CALL_SUBTEST_3(test_hip_convolution_inner_dim_row_major_1d());
+  // CALL_SUBTEST_3(test_hip_convolution_2d<ColMajor>());
+  // CALL_SUBTEST_3(test_hip_convolution_2d<RowMajor>());
+  // CALL_SUBTEST_3(test_hip_convolution_3d<ColMajor>());
+  // CALL_SUBTEST_3(test_hip_convolution_3d<RowMajor>());
 
 #if __cplusplus > 199711L
   // std::erf, std::erfc, and so on where only added in c++11. We use them
