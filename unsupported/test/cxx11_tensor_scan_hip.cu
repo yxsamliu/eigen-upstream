@@ -13,11 +13,6 @@
 #define EIGEN_DEFAULT_DENSE_INDEX_TYPE int
 #define EIGEN_USE_GPU
 
-#ifdef __NVCC__
-#if defined __CUDACC_VER__ && __CUDACC_VER__ >= 70500
-#include <cuda_fp16.h>
-#endif
-#endif
 #include "main.h"
 #include <unsupported/Eigen/CXX11/Tensor>
 
@@ -76,6 +71,6 @@ void test_hip_cumsum(int m_size, int k_size, int n_size)
 
 void test_cxx11_tensor_scan_hip()
 {
-  CALL_SUBTEST(test_hip_cumsum<ColMajor>(128, 128, 128));
-  CALL_SUBTEST(test_hip_cumsum<RowMajor>(128, 128, 128));
+  CALL_SUBTEST_1(test_hip_cumsum<ColMajor>(128, 128, 128));
+  CALL_SUBTEST_2(test_hip_cumsum<RowMajor>(128, 128, 128));
 }
