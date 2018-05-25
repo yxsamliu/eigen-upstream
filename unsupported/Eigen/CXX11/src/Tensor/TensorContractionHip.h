@@ -1,4 +1,3 @@
-//#include "hip/hip_runtime.h"
 // This file is part of Eigen, a lightweight C++ template library
 // for linear algebra.
 //
@@ -13,7 +12,7 @@
 #ifndef EIGEN_CXX11_TENSOR_TENSOR_CONTRACTION_HIP_H
 #define EIGEN_CXX11_TENSOR_TENSOR_CONTRACTION_HIP_H
 
-#if defined(EIGEN_USE_GPU) && defined(__HIPCC__)
+#if defined(EIGEN_USE_GPU) && defined(EIGEN_HIPCC)
 
 namespace Eigen {
 
@@ -530,7 +529,6 @@ EigenFloatContractionKernelInternal16x16(const LhsMapper lhs, const RhsMapper rh
                        float2 rhs_shmem2[][8], const Index m_size,
                        const Index n_size, const Index k_size,
                        const Index base_m, const Index base_n) {
-  typedef float Scalar;
 
   // prefetch registers
   float4 lhs_pf0, rhs_pf0;
@@ -785,7 +783,6 @@ EigenFloatContractionKernelInternal(const LhsMapper lhs, const RhsMapper rhs,
                        float2 rhs_shmem2[][8], const Index m_size,
                        const Index n_size, const Index k_size,
                        const Index base_m, const Index base_n) {
-  typedef float Scalar;
 
   // prefetch registers
   float4 lhs_pf0, lhs_pf1, lhs_pf2, lhs_pf3;
@@ -1513,16 +1510,12 @@ struct TensorEvaluator<const TensorContractionOp<Indices, LeftArgType, RightArgT
 
     OutputMapper output(buffer, m);
 
-#ifdef __NVCC__
-    //TODO:setCudaSharedMemConfig(CudaSharedMemBankSizeEightByte);
-#elif __HCC__
     setHipSharedMemConfig(hipSharedMemBankSizeEightByte);
-#endif
     LaunchKernels<LhsScalar, RhsScalar, Index, LhsMapper, RhsMapper, OutputMapper>::Run(lhs, rhs, output,  m, n, k, this->m_device);
   }
 };
 
 } // end namespace Eigen
 
-#endif // EIGEN_USE_GPU and __HIPCC__
+#endif // EIGEN_USE_GPU and EIGEN_HIPCC
 #endif // EIGEN_CXX11_TENSOR_TENSOR_CONTRACTION_HIP_H

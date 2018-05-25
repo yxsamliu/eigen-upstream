@@ -140,20 +140,20 @@ static void test_last_dim_reductions() {
 
 
 void test_cxx11_tensor_reduction_hip() {
-  CALL_SUBTEST_1((test_full_reductions<float, ColMajor>()));
-  CALL_SUBTEST_1((test_full_reductions<double, ColMajor>()));
-  CALL_SUBTEST_2((test_full_reductions<float, RowMajor>()));
-  CALL_SUBTEST_2((test_full_reductions<double, RowMajor>()));
+  CALL_SUBTEST((test_full_reductions<float, ColMajor>()));
+  CALL_SUBTEST((test_full_reductions<double, ColMajor>()));
+  CALL_SUBTEST((test_full_reductions<float, RowMajor>()));
+  CALL_SUBTEST((test_full_reductions<double, RowMajor>()));
   
-  CALL_SUBTEST_3((test_first_dim_reductions<float, ColMajor>()));
-  CALL_SUBTEST_3((test_first_dim_reductions<double, ColMajor>()));
-  CALL_SUBTEST_4((test_first_dim_reductions<float, RowMajor>()));
+  CALL_SUBTEST((test_first_dim_reductions<float, ColMajor>()));
+  CALL_SUBTEST((test_first_dim_reductions<double, ColMajor>()));
+  CALL_SUBTEST((test_first_dim_reductions<float, RowMajor>()));
 // Outer reductions of doubles aren't supported just yet.  					      
-//  CALL_SUBTEST_4((test_first_dim_reductions<double, RowMajor>()))
+//  CALL_SUBTEST((test_first_dim_reductions<double, RowMajor>()))
 
-  CALL_SUBTEST_5((test_last_dim_reductions<float, ColMajor>()));
+  CALL_SUBTEST((test_last_dim_reductions<float, ColMajor>()));
 // Outer reductions of doubles aren't supported just yet.  					      
-//  CALL_SUBTEST_5((test_last_dim_reductions<double, ColMajor>()));
-  CALL_SUBTEST_6((test_last_dim_reductions<float, RowMajor>()));
-  CALL_SUBTEST_6((test_last_dim_reductions<double, RowMajor>()));
+//  CALL_SUBTEST((test_last_dim_reductions<double, ColMajor>()));
+  CALL_SUBTEST((test_last_dim_reductions<float, RowMajor>()));
+  CALL_SUBTEST((test_last_dim_reductions<double, RowMajor>()));
 }

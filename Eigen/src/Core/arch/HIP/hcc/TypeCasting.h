@@ -19,8 +19,8 @@ struct scalar_cast_op<float, Eigen::half> {
   EIGEN_EMPTY_STRUCT_CTOR(scalar_cast_op)
   typedef Eigen::half result_type;
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Eigen::half operator() (const float& a) const {
-    #if defined(EIGEN_HAS_HIP_FP16)
-    return __float2half(a);
+    #if defined(EIGEN_HAS_HIP_FP16) && defined(EIGEN_HIP_DEVICE_COMPILE)
+      return __float2half(a);
     #else
       return Eigen::half(a);
     #endif
@@ -37,7 +37,7 @@ struct scalar_cast_op<int, Eigen::half> {
   EIGEN_EMPTY_STRUCT_CTOR(scalar_cast_op)
   typedef Eigen::half result_type;
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE Eigen::half operator() (const int& a) const {
-    #if defined(EIGEN_HAS_HIP_FP16)
+    #if defined(EIGEN_HAS_HIP_FP16) && defined(EIGEN_HIP_DEVICE_COMPILE)
     return __float2half(static_cast<float>(a));
     #else
       return Eigen::half(static_cast<float>(a));
@@ -55,8 +55,8 @@ struct scalar_cast_op<Eigen::half, float> {
   EIGEN_EMPTY_STRUCT_CTOR(scalar_cast_op)
   typedef float result_type;
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE float operator() (const Eigen::half& a) const {
-    #if defined(EIGEN_HAS_HIP_FP16)
-      return __half2float(a.x);
+    #if defined(EIGEN_HAS_HIP_FP16) && defined(EIGEN_HIP_DEVICE_COMPILE)
+      return __half2float(a.data);
     #else
       return static_cast<float>(a);
     #endif
@@ -69,9 +69,9 @@ struct functor_traits<scalar_cast_op<Eigen::half, float> >
 
 
 
-#if defined(EIGEN_HAS_HIP_FP16)
+#if defined(EIGEN_HAS_HIP_FP16) && defined(EIGEN_HIP_DEVICE_COMPILE)
 
- template <>
+template <>
 struct type_casting_traits<Eigen::half, float> {
   enum {
     VectorizedCast = 1,
@@ -98,6 +98,33 @@ struct type_casting_traits<float, Eigen::half> {
 template<> EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE half2 pcast<float4, half2>(const float4& a) {
   // Simply discard the second half of the input
   return __floats2half2_rn(a.x, a.y);
+}
+
+#elif defined EIGEN_VECTORIZE_AVX512
+template <>
+struct type_casting_traits<half, float> {
+  enum {
+    VectorizedCast = 1,
+    SrcCoeffRatio = 1,
+    TgtCoeffRatio = 1
+  };
+};
+
+template<> EIGEN_STRONG_INLINE Packet16f pcast<Packet16h, Packet16f>(const Packet16h& a) {
+  return half2float(a);
+}
+
+template <>
+struct type_casting_traits<float, half> {
+  enum {
+    VectorizedCast = 1,
+    SrcCoeffRatio = 1,
+    TgtCoeffRatio = 1
+  };
+};
+
+template<> EIGEN_STRONG_INLINE Packet16h pcast<Packet16f, Packet16h>(const Packet16f& a) {
+  return float2half(a);
 }
 
 #elif defined EIGEN_VECTORIZE_AVX

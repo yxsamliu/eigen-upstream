@@ -441,7 +441,6 @@ struct round_retval
       #else 		  
       EIGEN_USING_STD_MATH(arg);
       #endif
-      
       return arg(x);
     }
   };
@@ -774,7 +773,9 @@ EIGEN_DEVICE_FUNC
 typename internal::enable_if<(!internal::is_integral<T>::value)&&(!NumTraits<T>::IsComplex),bool>::type
 isfinite_impl(const T& x)
 {
-  #if defined(EIGEN_CUDA_ARCH) || defined(EIGEN_HIP_DEVICE_COMPILE)
+  #if defined(EIGEN_HIP_DEVICE_COMPILE)
+    return isfinite(x);
+  #elif defined(EIGEN_CUDA_ARCH)
     return (::isfinite)(x);
   #elif EIGEN_USE_STD_FPCLASSIFY
     using std::isfinite;
@@ -789,7 +790,9 @@ EIGEN_DEVICE_FUNC
 typename internal::enable_if<(!internal::is_integral<T>::value)&&(!NumTraits<T>::IsComplex),bool>::type
 isinf_impl(const T& x)
 {
-  #if defined(EIGEN_CUDA_ARCH) || defined(EIGEN_HIP_DEVICE_COMPILE)
+  #if defined(EIGEN_HIP_DEVICE_COMPILE)
+    return isinf(x);
+  #elif defined(EIGEN_CUDA_ARCH)
     return (::isinf)(x);
   #elif EIGEN_USE_STD_FPCLASSIFY
     using std::isinf;
@@ -804,7 +807,9 @@ EIGEN_DEVICE_FUNC
 typename internal::enable_if<(!internal::is_integral<T>::value)&&(!NumTraits<T>::IsComplex),bool>::type
 isnan_impl(const T& x)
 {
-  #if defined(EIGEN_CUDA_ARCH) || defined(EIGEN_HIP_DEVICE_COMPILE)
+  #if defined(EIGEN_HIP_DEVICE_COMPILE)
+    return isnan(x);
+  #elif defined(EIGEN_CUDA_ARCH)
     return (::isnan)(x);
   #elif EIGEN_USE_STD_FPCLASSIFY
     using std::isnan;

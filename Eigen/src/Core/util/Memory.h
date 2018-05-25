@@ -162,7 +162,7 @@ EIGEN_DEVICE_FUNC inline void* aligned_malloc(std::size_t size)
   #if (EIGEN_DEFAULT_ALIGN_BYTES==0) || EIGEN_MALLOC_ALREADY_ALIGNED
   
     #if defined(EIGEN_HIP_DEVICE_COMPILE)
-    result = aligned_malloc(size);  // This looks like a recursive call....how come this compiles?
+    result = aligned_malloc(size);
     #else
     result = std::malloc(size);
     #endif
@@ -186,7 +186,7 @@ EIGEN_DEVICE_FUNC inline void aligned_free(void *ptr)
   #if (EIGEN_DEFAULT_ALIGN_BYTES==0) || EIGEN_MALLOC_ALREADY_ALIGNED
 
     #if defined(EIGEN_HIP_DEVICE_COMPILE)
-    aligned_free(ptr);  // This looks like a recursive call....how come this compiles?
+    aligned_free(ptr);
     #else
     std::free(ptr);
     #endif
@@ -518,7 +518,11 @@ template<typename T> struct smart_copy_helper<T,true> {
     IntPtr size = IntPtr(end)-IntPtr(start);
     if(size==0) return;
     eigen_internal_assert(start!=0 && end!=0 && target!=0);
+    #if defined(EIGEN_HIP_DEVICE_COMPILE)
+    ::memcpy(target, start, size);
+    #else
     std::memcpy(target, start, size);
+    #endif
   }
 };
 

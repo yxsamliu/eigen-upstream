@@ -297,7 +297,11 @@ template<typename Scalar, typename Packet> EIGEN_DEVICE_FUNC inline void pstoreu
  { pstore(to, from); }
 
 /** \internal tries to do cache prefetching of \a addr */
-template<typename Scalar> EIGEN_DEVICE_FUNC inline void prefetch(const Scalar* addr)
+template<typename Scalar>
+  #if !defined(EIGEN_HIPCC)
+  EIGEN_DEVICE_FUNC
+  #endif
+  inline void prefetch(const Scalar* addr)
 {
 #ifdef EIGEN_CUDA_ARCH
 #if defined(__LP64__)

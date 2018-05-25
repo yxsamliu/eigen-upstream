@@ -1,4 +1,3 @@
-//#include "hip/hip_runtime.h"
 // This file is part of Eigen, a lightweight C++ template library
 // for linear algebra.
 //
@@ -11,13 +10,11 @@
 #ifndef EIGEN_CXX11_TENSOR_TENSOR_REDUCTION_HIP_H
 #define EIGEN_CXX11_TENSOR_TENSOR_REDUCTION_HIP_H
 
-#ifdef __HIP_DEVICE_COMPILE__
+#if defined(EIGEN_HIP_DEVICE_COMPILE)
 #include "Eigen/src/Core/arch/HIP/hcc/math_constants.h"
 #endif
 
-#ifdef __NVCC__
-#define HIP_WARP_SIZE 32
-#elif defined(__HCC__)
+#if defined(EIGEN_HIPCC)
 #define HIP_WARP_SIZE 64
 #endif
 
@@ -25,7 +22,7 @@ namespace Eigen {
 namespace internal {
 
 
-#if defined(EIGEN_USE_GPU) && defined(__HIPCC__)
+#if defined(EIGEN_USE_GPU) && defined(EIGEN_HIPCC)
 // Full reducers for GPU, don't vectorize for now
 
 // Reducer function that enables multiple hip thread to safely accumulate at the same
@@ -34,8 +31,7 @@ namespace internal {
 // updated the content of the output address it will try again.
 template <typename T, typename R>
 __device__ EIGEN_ALWAYS_INLINE void atomicReduce(T* output, T accum, R& reducer) {
-#if defined(__HIP_DEVICE_COMPILE__) && \
-    defined(__HIP_ARCH_HAS_WARP_SHUFFLE__)
+#if defined(EIGEN_HIP_DEVICE_COMPILE) && defined(__HIP_ARCH_HAS_WARP_SHUFFLE__)
   if (sizeof(T) == 4)
   {
     unsigned int oldval = *reinterpret_cast<unsigned int*>(output);
@@ -91,7 +87,7 @@ __device__ inline double atomicExchCustom(double* address, double val) {
   return __longlong_as_double(atomicExch(address_as_ull, __double_as_longlong(val)));
 }
 
-#ifdef EIGEN_HAS_HIP_FP16
+#if defined(EIGEN_HAS_HIP_FP16)
 template <template <typename T> class R>
 __device__ inline void atomicReduce(half2* output, half2 accum, R<half>& reducer) {
   unsigned int oldval = *reinterpret_cast<unsigned int*>(output);
@@ -114,7 +110,7 @@ __device__ inline void atomicReduce(half2* output, half2 accum, R<half>& reducer
 
 template <>
 __device__ inline void atomicReduce(float* output, float accum, SumReducer<float>&) {
-#if defined(__HIP_DEVICE_COMPILE__) && (__HIP_DEVICE_COMPILE__ == 1) &&\
+#if defined(EIGEN_HIP_DEVICE_COMPILE) && (__HIP_DEVICE_COMPILE__ == 1) &&\
     defined(__HIP_ARCH_HAS_WARP_SHUFFLE__)
   atomicAdd(output, accum);
 #else
@@ -137,7 +133,7 @@ template <int BlockSize, int NumPerThread, typename Self,
           typename Reducer, typename Index>
 __global__ void FullReductionKernel(const Self input, Index num_coeffs,
                                     typename Self::CoeffReturnType* output, unsigned int* semaphore, Reducer reducer) {
-#if defined(__HIP_DEVICE_COMPILE__) && (__HIP_DEVICE_COMPILE__ == 1) &&\
+#if defined(EIGEN_HIP_DEVICE_COMPILE) && (__HIP_DEVICE_COMPILE__ == 1) &&\
     defined(__HIP_ARCH_HAS_WARP_SHUFFLE__)
   // Initialize the output value
   const Index first_index = hipBlockIdx_x * BlockSize * NumPerThread + hipThreadIdx_x;
@@ -206,7 +202,7 @@ __global__ void FullReductionKernel(const Self input, Index num_coeffs,
 }
 
 
-#ifdef EIGEN_HAS_HIP_FP16
+#if defined(EIGEN_HAS_HIP_FP16)
 template <typename Self,
           typename Reducer, typename Index>
 __global__ void ReductionInitFullReduxKernelHalfFloat(Reducer reducer, const Self input, Index num_coeffs, half2* scratch) {
@@ -214,7 +210,7 @@ __global__ void ReductionInitFullReduxKernelHalfFloat(Reducer reducer, const Sel
   eigen_assert(hipGridDim_x == 1);
   if (num_coeffs % 2 != 0) {
     half last = input.m_impl.coeff(num_coeffs-1);
-    *scratch = __halves2half2(last.x, reducer.initialize().x);
+    *scratch = __halves2half2(last.data, reducer.initialize().data);
   } else {
     *scratch = reducer.template initializePacket<half2>();
   }
@@ -247,7 +243,7 @@ __global__ void FullReductionKernelHalfFloat(Reducer reducer, const Self input, 
   if (hipGridDim_x == 1 && first_index == 0) {
     if (num_coeffs % 2 != 0) {
       half last = input.m_impl.coeff(num_coeffs-1);
-      *scratch = __halves2half2(last.x, reducer.initialize().x);
+      *scratch = __halves2half2(last.data, reducer.initialize().data);
     } else {
       *scratch = reducer.template initializePacket<half2>();
     }
@@ -356,7 +352,7 @@ struct FullReductionLauncher<
   }
 };
 
-#ifdef EIGEN_HAS_HIP_FP16
+#if defined(EIGEN_HAS_HIP_FP16)
 template <typename Self, typename Op>
 struct FullReductionLauncher<Self, Op, Eigen::half, false> {
   static void run(const Self&, Op&, const GpuDevice&, half*, typename Self::Index) {
@@ -398,7 +394,7 @@ struct FullReducer<Self, Op, GpuDevice, Vectorizable> {
   // Unfortunately nvidia doesn't support well exotic types such as complex,
   // so reduce the scope of the optimized version of the code to the simple cases
   // of doubles, floats and half floats
-#ifdef EIGEN_HAS_HIP_FP16
+#if defined(EIGEN_HAS_HIP_FP16)
   static const bool HasOptimizedImplementation = !Op::IsStateful &&
       (internal::is_same<typename Self::CoeffReturnType, float>::value ||
        internal::is_same<typename Self::CoeffReturnType, double>::value ||
@@ -427,7 +423,7 @@ template <int NumPerThread, typename Self,
           typename Reducer, typename Index>
 __global__ void InnerReductionKernel(Reducer reducer, const Self input, Index num_coeffs_to_reduce, Index num_preserved_coeffs,
                                          typename Self::CoeffReturnType* output) {
-#if defined(__HIP_DEVICE_COMPILE__) && (__HIP_DEVICE_COMPILE__ == 1) &&\
+#if defined(EIGEN_HIP_DEVICE_COMPILE) && (__HIP_DEVICE_COMPILE__ == 1) &&\
     defined(__HIP_ARCH_HAS_WARP_SHUFFLE__)
   typedef typename Self::CoeffReturnType Type;
   eigen_assert(hipBlockDim_y == 1);
@@ -499,7 +495,7 @@ __global__ void InnerReductionKernel(Reducer reducer, const Self input, Index nu
 #endif
 }
 
-#ifdef EIGEN_HAS_HIP_FP16
+#if defined(EIGEN_HAS_HIP_FP16)
 
 template <int NumPerThread, typename Self,
           typename Reducer, typename Index>
@@ -556,10 +552,10 @@ __global__ void InnerReductionKernelHalfFloat(Reducer reducer, const Self input,
           if (col < num_coeffs_to_reduce) {
             // Peel;
             const half last1 = input.m_impl.coeff(row * num_coeffs_to_reduce + col);
-            const half2 val1 = __halves2half2(last1.x, reducer.initialize().x);
+            const half2 val1 = __halves2half2(last1.data, reducer.initialize().data);
             reducer.reducePacket(val1, &reduced_val1);
             const half last2 = input.m_impl.coeff((row+1) * num_coeffs_to_reduce + col);
-            const half2 val2 = __halves2half2(last2.x, reducer.initialize().x);
+            const half2 val2 = __halves2half2(last2.data, reducer.initialize().data);
             reducer.reducePacket(val2, &reduced_val2);
           }
           break;
@@ -592,7 +588,7 @@ __global__ void InnerReductionKernelHalfFloat(Reducer reducer, const Self input,
       reducer.reduce(__high2half(reduced_val1), &val1);
       half val2 =  __low2half(reduced_val2);
       reducer.reduce(__high2half(reduced_val2), &val2);
-      half2 val = __halves2half2(val1.x, val2.x);
+      half2 val = __halves2half2(val1.data, val2.data);
 
       if ((hipThreadIdx_x & (HIP_WARP_SIZE - 1)) == 0) {
         half* loc = output + row;
@@ -651,7 +647,7 @@ struct InnerReductionLauncher<
   }
 };
 
-#ifdef EIGEN_HAS_HIP_FP16
+#if defined(EIGEN_HAS_HIP_FP16)
 template <typename Self, typename Op>
 struct InnerReductionLauncher<Self, Op, Eigen::half, false> {
   static bool run(const Self&, Op&, const GpuDevice&, half*, typename Self::Index, typename Self::Index) {
@@ -703,7 +699,7 @@ struct InnerReducer<Self, Op, GpuDevice> {
   // Unfortunately nvidia doesn't support well exotic types such as complex,
   // so reduce the scope of the optimized version of the code to the simple case
   // of floats and half floats.
-#ifdef EIGEN_HAS_HIP_FP16
+#if defined(EIGEN_HAS_HIP_FP16)
   static const bool HasOptimizedImplementation = !Op::IsStateful &&
       (internal::is_same<typename Self::CoeffReturnType, float>::value ||
        internal::is_same<typename Self::CoeffReturnType, double>::value ||

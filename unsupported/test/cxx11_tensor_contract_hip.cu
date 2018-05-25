@@ -14,13 +14,9 @@
 #define EIGEN_DEFAULT_DENSE_INDEX_TYPE int
 #define EIGEN_USE_GPU
 
-#ifdef __NVCC__
-#if defined __CUDACC_VER__ && __CUDACC_VER__ >= 70500
-#include <cuda_fp16.h>
-#endif
-#endif
 #include "main.h"
 #include <unsupported/Eigen/CXX11/Tensor>
+
 
 using Eigen::Tensor;
 typedef Tensor<float, 1>::DimensionPair DimPair;
@@ -65,7 +61,6 @@ void test_hip_contraction(int m_size, int k_size, int n_size)
       gpu_t_right(d_t_right, Eigen::array<int, 2>(k_size, n_size));
   Eigen::TensorMap<Eigen::Tensor<float, 2, DataLayout> >
       gpu_t_result(d_t_result, Eigen::array<int, 2>(m_size, n_size));
-
 
 
   gpu_t_result.device(gpu_device) = gpu_t_left.contract(gpu_t_right, dims);
@@ -205,15 +200,15 @@ void test_cxx11_tensor_hip()
   CALL_SUBTEST(test_scalar<ColMajor>(128, 128, 128));
   CALL_SUBTEST(test_scalar<RowMajor>(128, 128, 128));
 
-  //CALL_SUBTEST(test_hip_contraction_m<ColMajor>());
-  //CALL_SUBTEST(test_hip_contraction_m<RowMajor>());
+  CALL_SUBTEST(test_hip_contraction_m<ColMajor>());
+  CALL_SUBTEST(test_hip_contraction_m<RowMajor>());
 
-  //CALL_SUBTEST(test_hip_contraction_k<ColMajor>());
-  //CALL_SUBTEST(test_hip_contraction_k<RowMajor>());
+  CALL_SUBTEST(test_hip_contraction_k<ColMajor>());
+  CALL_SUBTEST(test_hip_contraction_k<RowMajor>());
 
-  //CALL_SUBTEST(test_hip_contraction_n<ColMajor>());
-  //CALL_SUBTEST(test_hip_contraction_n<RowMajor>());
+  CALL_SUBTEST(test_hip_contraction_n<ColMajor>());
+  CALL_SUBTEST(test_hip_contraction_n<RowMajor>());
 
-  //CALL_SUBTEST(test_hip_contraction_sizes<ColMajor>());
-  //CALL_SUBTEST(test_hip_contraction_sizes<RowMajor>());
+  CALL_SUBTEST(test_hip_contraction_sizes<ColMajor>());
+  CALL_SUBTEST(test_hip_contraction_sizes<RowMajor>());
 }
