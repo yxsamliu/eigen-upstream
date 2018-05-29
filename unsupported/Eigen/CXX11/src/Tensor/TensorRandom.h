@@ -84,14 +84,9 @@ Eigen::half RandomToTypeUniform<Eigen::half>(uint64_t* state, uint64_t stream) {
   Eigen::half result;
   // Generate 10 random bits for the mantissa
   unsigned rnd = PCG_XSH_RS_generator(state, stream);
-  unsigned short int raw_ushort = static_cast<uint16_t>(rnd & 0x3ffu);
+  result.x = static_cast<uint16_t>(rnd & 0x3ffu);
   // Set the exponent
-  raw_ushort |= (static_cast<uint16_t>(15) << 10);
-#if defined(EIGEN_HAS_HIP_FP16) 
-  result.x = __ushort_as_half(raw_ushort);
-#else
-  result.x = raw_ushort;
-#endif
+  result.x |= (static_cast<uint16_t>(15) << 10);
   // Return the final result
   return result - Eigen::half(1.0f);
 }
