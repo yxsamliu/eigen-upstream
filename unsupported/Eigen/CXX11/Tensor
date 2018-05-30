@@ -137,7 +137,11 @@ typedef unsigned __int64 uint64_t;
   #include "src/Tensor/TensorContractionCuda.h"
 #endif
 #include "src/Tensor/TensorConversion.h"
-#include "src/Tensor/TensorConvolution.h"
+#if defined(EIGEN_USE_HIP)
+  #include "src/Tensor/TensorConvolutionHip.h"
+#else
+  #include "src/Tensor/TensorConvolution.h"
+#endif   
 #include "src/Tensor/TensorFFT.h"
 #include "src/Tensor/TensorPatch.h"
 #include "src/Tensor/TensorImagePatch.h"

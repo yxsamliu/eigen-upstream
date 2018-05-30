@@ -367,6 +367,7 @@ void test_gpu() {
     }
   }
 
+  /*
   test_3d_convolution(&context);
   assert(hipMemcpyAsync(out.data(), d_out, out_bytes, hipMemcpyDeviceToHost, context.device().stream()) == hipSuccess);
   assert(hipStreamSynchronize(context.device().stream()) == hipSuccess);
@@ -382,6 +383,7 @@ void test_gpu() {
       }
     }
   }
+  */
 }
 
 
