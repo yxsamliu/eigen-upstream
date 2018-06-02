@@ -395,7 +395,7 @@ struct TensorContractionEvaluatorBase
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE const Dimensions& dimensions() const { return m_dimensions; }
 
-    EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool evalSubExprsIfNeeded(Scalar * data) {
+  EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE bool evalSubExprsIfNeeded(Scalar * data) {
     m_leftImpl.evalSubExprsIfNeeded(NULL);
     m_rightImpl.evalSubExprsIfNeeded(NULL);
     if (data) {
@@ -408,7 +408,7 @@ struct TensorContractionEvaluatorBase
     }
   }
 
-    EIGEN_DEVICE_FUNC void evalTo(Scalar* buffer) const {
+  EIGEN_DEVICE_FUNC void evalTo(Scalar* buffer) const {
     if (this->m_lhs_inner_dim_contiguous) {
       if (this->m_rhs_inner_dim_contiguous) {
         if (this->m_rhs_inner_dim_reordered) {

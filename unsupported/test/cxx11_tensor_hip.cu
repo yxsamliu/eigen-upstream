@@ -1222,6 +1222,7 @@ void test_cxx11_tensor_hip()
   CALL_SUBTEST(test_hip_elementwise());
   CALL_SUBTEST(test_hip_props());
   CALL_SUBTEST(test_hip_reduction());
+  // FIXME : uncommenting following tests results in compile failure
   // CALL_SUBTEST(test_hip_contraction<ColMajor>());
   // CALL_SUBTEST(test_hip_contraction<RowMajor>());
   CALL_SUBTEST(test_hip_convolution_1d<ColMajor>());
@@ -1230,6 +1231,7 @@ void test_cxx11_tensor_hip()
   CALL_SUBTEST(test_hip_convolution_inner_dim_row_major_1d());
   CALL_SUBTEST(test_hip_convolution_2d<ColMajor>());
   CALL_SUBTEST(test_hip_convolution_2d<RowMajor>());
+  // The following two tests commented out due to long runtime
   // CALL_SUBTEST(test_hip_convolution_3d<ColMajor>());
   // CALL_SUBTEST(test_hip_convolution_3d<RowMajor>());
 
@@ -1237,11 +1239,14 @@ void test_cxx11_tensor_hip()
   // std::erf, std::erfc, and so on where only added in c++11. We use them
   // as a golden reference to validate the results produced by Eigen. Therefore
   // we can only run these tests if we use a c++11 compiler.
+
+  // Following tests have functional failures on some seeds
   // CALL_SUBTEST(test_hip_lgamma<float>(1.0f));
   // CALL_SUBTEST(test_hip_lgamma<float>(100.0f));
   // CALL_SUBTEST(test_hip_lgamma<float>(0.01f));
   // CALL_SUBTEST(test_hip_lgamma<float>(0.001f));
 
+  // Following tests have functional failures on some seeds
   // CALL_SUBTEST(test_hip_lgamma<double>(1.0));
   // CALL_SUBTEST(test_hip_lgamma<double>(100.0));
   // CALL_SUBTEST(test_hip_lgamma<double>(0.01));
@@ -1269,21 +1274,26 @@ void test_cxx11_tensor_hip()
   CALL_SUBTEST(test_hip_erfc<double>(0.01));
   CALL_SUBTEST(test_hip_erfc<double>(0.001));
 
+  // Following tests have functional failures on some seeds
   // CALL_SUBTEST(test_hip_digamma<float>());
   // CALL_SUBTEST(test_hip_digamma<double>());
 
+  // Following tests have functional failures on some seeds
   // CALL_SUBTEST(test_hip_polygamma<float>());
   // CALL_SUBTEST(test_hip_polygamma<double>());
 
+  // Following tests have functional failures on some seeds
   // CALL_SUBTEST(test_hip_zeta<float>());
   // CALL_SUBTEST(test_hip_zeta<double>());
 
   CALL_SUBTEST(test_hip_igamma<float>());
   CALL_SUBTEST(test_hip_igammac<float>());
 
+  // Following tests have functional failures on some seeds
   // CALL_SUBTEST(test_hip_igamma<double>());
   // CALL_SUBTEST(test_hip_igammac<double>());
 
+  // Following tests have functional failures on some seeds
   // CALL_SUBTEST(test_hip_betainc<float>());
   // CALL_SUBTEST(test_hip_betainc<double>());
 #endif

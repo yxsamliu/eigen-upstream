@@ -209,6 +209,7 @@ void test_cxx11_tensor_hip()
   CALL_SUBTEST(test_hip_contraction_n<ColMajor>());
   CALL_SUBTEST(test_hip_contraction_n<RowMajor>());
 
+  // Commenting out these tests due to long runtimes
   // CALL_SUBTEST(test_hip_contraction_sizes<ColMajor>());
   // CALL_SUBTEST(test_hip_contraction_sizes<RowMajor>());
 }

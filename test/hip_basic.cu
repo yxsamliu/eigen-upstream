@@ -151,7 +151,8 @@ void test_hip_basic()
   
   CALL_SUBTEST( run_and_compare_to_hip(coeff_wise<Vector3f>(), nthreads, in, out) );
   CALL_SUBTEST( run_and_compare_to_hip(coeff_wise<Array44f>(), nthreads, in, out) );
-  
+
+  // FIXME compile fails when we uncomment the followig two tests
   // CALL_SUBTEST( run_and_compare_to_hip(replicate<Array4f>(), nthreads, in, out) );
   // CALL_SUBTEST( run_and_compare_to_hip(replicate<Array33f>(), nthreads, in, out) );
   
@@ -163,7 +164,8 @@ void test_hip_basic()
   
   CALL_SUBTEST( run_and_compare_to_hip(diagonal<Matrix3f,Vector3f>(), nthreads, in, out) );
   CALL_SUBTEST( run_and_compare_to_hip(diagonal<Matrix4f,Vector4f>(), nthreads, in, out) );
-  
+
+  // FIXME : Runtime failure occurs when we uncomment the following two tests
   // CALL_SUBTEST( run_and_compare_to_hip(eigenvalues<Matrix3f>(), nthreads, in, out) );
   // CALL_SUBTEST( run_and_compare_to_hip(eigenvalues<Matrix2f>(), nthreads, in, out) );
 

@@ -12,11 +12,6 @@
 #define EIGEN_TEST_FUNC cxx11_tensor_reduction_hip
 #define EIGEN_USE_GPU
 
-#ifdef __NVCC__
-#if defined __CUDACC_VER__ && __CUDACC_VER__ >= 70500
-#include <cuda_fp16.h>
-#endif
-#endif
 #include "main.h"
 #include <unsupported/Eigen/CXX11/Tensor>
 

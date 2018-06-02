@@ -71,6 +71,15 @@ inline void throw_std_bad_alloc()
   #else
     std::size_t huge = static_cast<std::size_t>(-1);
     #if defined(EIGEN_HIPCC)
+    //
+    // calls to "::operator new" are to be treated as opaque function calls (i.e no inlining),
+    // and as a consequence the code in the #else block triggers the hipcc warning :
+    // "no overloaded function has restriction specifiers that are compatible with the ambient context"
+    //
+    // "throw_std_bad_alloc" has the EIGEN_DEVICE_FUNC attribute, so it seems that hipcc expects
+    // the same on "operator new" 
+    // Reverting code back to the old version in this #if block for the hipcc compiler
+    //
     new int[huge];
     #else
     ::operator new(huge);

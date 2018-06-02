@@ -10,7 +10,7 @@
 #if defined(EIGEN_USE_GPU) && !defined(EIGEN_CXX11_TENSOR_TENSOR_DEVICE_HIP_H)
 #define EIGEN_CXX11_TENSOR_TENSOR_DEVICE_HIP_H
 
-#ifdef __HIPCC__
+#if defined(EIGEN_HIPCC)
 #include "hip/hip_runtime.h"
 #include "hip/hip_runtime_api.h"
 #endif
@@ -218,7 +218,7 @@ struct GpuDevice {
   }
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void memcpy(void* dst, const void* src, size_t n) const {
-#ifndef __HIP_DEVICE_COMPILE__
+#if !defined(EIGEN_HIP_DEVICE_COMPILE)
     hipError_t err = hipMemcpyAsync(dst, src, n, hipMemcpyDeviceToDevice,
                                       stream_->stream());
     EIGEN_UNUSED_VARIABLE(err)
@@ -243,7 +243,7 @@ struct GpuDevice {
   }
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void memset(void* buffer, int c, size_t n) const {
-#ifndef __HIP_DEVICE_COMPILE__
+#if !defined(EIGEN_HIP_DEVICE_COMPILE)
     //TODO:hipError_t err = hipMemsetAsync(buffer, c, n, stream_->stream());
     hipError_t err = hipMemset(buffer, c, n);
     EIGEN_UNUSED_VARIABLE(err)
@@ -270,14 +270,14 @@ struct GpuDevice {
   }
 
 // FIXME - this will move into HIP
-#ifdef __HIP_DEVICE_COMPILE__
+#if defined(EIGEN_HIP_DEVICE_COMPILE)
 #undef assert
 #define assert(COND)
 #endif
 
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE void synchronize() const {
-#if defined(__HIPCC__) && \
-    !defined(__HIP_DEVICE_COMPILE__)
+#if defined(EIGEN_HIPCC) && \
+    !defined(EIGEN_HIP_DEVICE_COMPILE)
     hipError_t err = hipStreamSynchronize(stream_->stream());
     if (err != hipSuccess) {
       std::cerr << "Error detected in HIP stream: "
@@ -316,7 +316,7 @@ struct GpuDevice {
   // This function checks if the HIP runtime recorded an error for the
   // underlying stream device.
   inline bool ok() const {
-#ifdef __HIPCC__
+#if defined(EIGEN_HIPCC)
     hipError_t error = hipStreamQuery(stream_->stream());
     return (error == hipSuccess) || (error == hipErrorNotReady);
 #else
@@ -335,9 +335,9 @@ struct GpuDevice {
 
 
 // FIXME: Should be device and kernel specific.
-#ifdef __HIPCC__
+#if defined(EIGEN_HIPCC)
 static EIGEN_DEVICE_FUNC inline void setHipSharedMemConfig(hipSharedMemConfig config) {
-#ifndef __HIP_DEVICE_COMPILE__
+#if !defined(EIGEN_HIP_DEVICE_COMPILE)
   hipError_t status = hipDeviceSetSharedMemConfig(config);
   EIGEN_UNUSED_VARIABLE(status)
   assert(status == hipSuccess);
