@@ -210,7 +210,7 @@ __global__ void ReductionInitFullReduxKernelHalfFloat(Reducer reducer, const Sel
   eigen_assert(hipGridDim_x == 1);
   if (num_coeffs % 2 != 0) {
     half last = input.m_impl.coeff(num_coeffs-1);
-    *scratch = __halves2half2(last.data, reducer.initialize().data);
+    *scratch = __halves2half2(last, reducer.initialize());
   } else {
     *scratch = reducer.template initializePacket<half2>();
   }
@@ -243,7 +243,7 @@ __global__ void FullReductionKernelHalfFloat(Reducer reducer, const Self input, 
   if (hipGridDim_x == 1 && first_index == 0) {
     if (num_coeffs % 2 != 0) {
       half last = input.m_impl.coeff(num_coeffs-1);
-      *scratch = __halves2half2(last.data, reducer.initialize().data);
+      *scratch = __halves2half2(last, reducer.initialize());
     } else {
       *scratch = reducer.template initializePacket<half2>();
     }
@@ -552,10 +552,10 @@ __global__ void InnerReductionKernelHalfFloat(Reducer reducer, const Self input,
           if (col < num_coeffs_to_reduce) {
             // Peel;
             const half last1 = input.m_impl.coeff(row * num_coeffs_to_reduce + col);
-            const half2 val1 = __halves2half2(last1.data, reducer.initialize().data);
+            const half2 val1 = __halves2half2(last1, reducer.initialize());
             reducer.reducePacket(val1, &reduced_val1);
             const half last2 = input.m_impl.coeff((row+1) * num_coeffs_to_reduce + col);
-            const half2 val2 = __halves2half2(last2.data, reducer.initialize().data);
+            const half2 val2 = __halves2half2(last2, reducer.initialize());
             reducer.reducePacket(val2, &reduced_val2);
           }
           break;
@@ -588,7 +588,7 @@ __global__ void InnerReductionKernelHalfFloat(Reducer reducer, const Self input,
       reducer.reduce(__high2half(reduced_val1), &val1);
       half val2 =  __low2half(reduced_val2);
       reducer.reduce(__high2half(reduced_val2), &val2);
-      half2 val = __halves2half2(val1.data, val2.data);
+      half2 val = __halves2half2(val1, val2);
 
       if ((hipThreadIdx_x & (HIP_WARP_SIZE - 1)) == 0) {
         half* loc = output + row;

@@ -56,7 +56,7 @@ struct scalar_cast_op<Eigen::half, float> {
   typedef float result_type;
   EIGEN_DEVICE_FUNC EIGEN_STRONG_INLINE float operator() (const Eigen::half& a) const {
     #if defined(EIGEN_HAS_HIP_FP16) && defined(EIGEN_HIP_DEVICE_COMPILE)
-      return __half2float(a.data);
+      return __half2float(a);
     #else
       return static_cast<float>(a);
     #endif

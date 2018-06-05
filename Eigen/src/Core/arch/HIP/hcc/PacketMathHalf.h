@@ -43,7 +43,11 @@ template<> struct packet_traits<Eigen::half> : default_packet_traits
 template<> struct unpacket_traits<half2> { typedef Eigen::half type; enum {size=2, alignment=Aligned16}; typedef half2 half; };
 
 template<> __device__ EIGEN_STRONG_INLINE half2 pset1<half2>(const Eigen::half& from) {
-  return half2half2(from.data);
+#if defined(EIGEN_HAS_OLD_HIP_FP16)
+  return half2half2(from);
+#else
+  return __half2half2(from);
+#endif
 }
 
 template<> __device__ EIGEN_STRONG_INLINE half2 pload<half2>(const Eigen::half* from) {
@@ -51,11 +55,11 @@ template<> __device__ EIGEN_STRONG_INLINE half2 pload<half2>(const Eigen::half* 
 }
 
 template<> __device__ EIGEN_STRONG_INLINE half2 ploadu<half2>(const Eigen::half* from) {
-  return __halves2half2(from[0].data, from[1].data);
+  return __halves2half2(from[0], from[1]);
 }
 
 template<> __device__ EIGEN_STRONG_INLINE half2 ploaddup<half2>(const Eigen::half*  from) {
-  return __halves2half2(from[0].data, from[0].data);
+  return __halves2half2(from[0], from[0]);
 }
 
 template<> __device__ EIGEN_STRONG_INLINE void pstore<Eigen::half>(Eigen::half* to, const half2& from) {
@@ -63,29 +67,35 @@ template<> __device__ EIGEN_STRONG_INLINE void pstore<Eigen::half>(Eigen::half* 
 }
 
 template<> __device__ EIGEN_STRONG_INLINE void pstoreu<Eigen::half>(Eigen::half* to, const half2& from) {
-  to[0].data = __low2half(from);
-  to[1].data = __high2half(from);
+  to[0] = __low2half(from);
+  to[1] = __high2half(from);
 }
 
 template<>
  __device__ EIGEN_ALWAYS_INLINE half2 ploadt_ro<half2, Aligned>(const Eigen::half* from) {
-  // todo : is there a __ldg(half) we can leverage here?
-  return __halves2half2((*(from+0)).data, (*(from+1)).data);
+#if defined(EIGEN_HAS_OLD_HIP_FP16)
+  return __halves2half2((*(from+0)), (*(from+1)));
+#else
+  return __ldg((const half2*)from);
+#endif
 }
 
 template<>
 __device__ EIGEN_ALWAYS_INLINE half2 ploadt_ro<half2, Unaligned>(const Eigen::half* from) {
-  // todo : is there a __ldg(half) we can leverage here?
-  return __halves2half2((*(from+0)).data, (*(from+1)).data);
+#if defined(EIGEN_HAS_OLD_HIP_FP16)
+  return __halves2half2((*(from+0)), (*(from+1)));
+#else
+  return __halves2half2(__ldg(from+0), __ldg(from+1));
+#endif
 }
 
 template<> __device__ EIGEN_STRONG_INLINE half2 pgather<Eigen::half, half2>(const Eigen::half* from, Index stride) {
-  return __halves2half2(from[0*stride].data, from[1*stride].data);
+  return __halves2half2(from[0*stride], from[1*stride]);
 }
 
 template<> __device__ EIGEN_STRONG_INLINE void pscatter<Eigen::half, half2>(Eigen::half* to, const half2& from, Index stride) {
-  to[stride*0].data = __low2half(from);
-  to[stride*1].data = __high2half(from);
+  to[stride*0] = __low2half(from);
+  to[stride*1] = __high2half(from);
 }
 
 template<> __device__ EIGEN_STRONG_INLINE Eigen::half pfirst<half2>(const half2& a) {
@@ -110,7 +120,7 @@ ptranspose(PacketBlock<half2,2>& kernel) {
 }
 
 template<> __device__ EIGEN_STRONG_INLINE half2 plset<half2>(const Eigen::half& a) {
-  return __halves2half2(a.data, __hadd(a.data, __float2half(1.0f)));
+  return __halves2half2(a, __hadd(a, __float2half(1.0f)));
 }
 
 template<> __device__ EIGEN_STRONG_INLINE half2 padd<half2>(const half2& a, const half2& b) {
@@ -136,7 +146,11 @@ template<> __device__ EIGEN_STRONG_INLINE half2 pmadd<half2>(const half2& a, con
 }
 
 template<> __device__ EIGEN_STRONG_INLINE half2 pdiv<half2>(const half2& a, const half2& b) {
+#if defined(EIGEN_HAS_OLD_HIP_FP16)
   return h2div(a, b);
+#else
+  return __h2div(a, b);
+#endif
 }
 
 template<> __device__ EIGEN_STRONG_INLINE half2 pmin<half2>(const half2& a, const half2& b) {

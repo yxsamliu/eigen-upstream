@@ -1240,17 +1240,15 @@ void test_cxx11_tensor_hip()
   // as a golden reference to validate the results produced by Eigen. Therefore
   // we can only run these tests if we use a c++11 compiler.
 
-  // Following tests have functional failures on some seeds
-  // CALL_SUBTEST(test_hip_lgamma<float>(1.0f));
-  // CALL_SUBTEST(test_hip_lgamma<float>(100.0f));
-  // CALL_SUBTEST(test_hip_lgamma<float>(0.01f));
-  // CALL_SUBTEST(test_hip_lgamma<float>(0.001f));
+  CALL_SUBTEST(test_hip_lgamma<float>(1.0f));
+  CALL_SUBTEST(test_hip_lgamma<float>(100.0f));
+  CALL_SUBTEST(test_hip_lgamma<float>(0.01f));
+  CALL_SUBTEST(test_hip_lgamma<float>(0.001f));
 
-  // Following tests have functional failures on some seeds
-  // CALL_SUBTEST(test_hip_lgamma<double>(1.0));
-  // CALL_SUBTEST(test_hip_lgamma<double>(100.0));
-  // CALL_SUBTEST(test_hip_lgamma<double>(0.01));
-  // CALL_SUBTEST(test_hip_lgamma<double>(0.001));
+  CALL_SUBTEST(test_hip_lgamma<double>(1.0));
+  CALL_SUBTEST(test_hip_lgamma<double>(100.0));
+  CALL_SUBTEST(test_hip_lgamma<double>(0.01));
+  CALL_SUBTEST(test_hip_lgamma<double>(0.001));
 
   CALL_SUBTEST(test_hip_erf<float>(1.0f));
   CALL_SUBTEST(test_hip_erf<float>(100.0f));
@@ -1258,8 +1256,8 @@ void test_cxx11_tensor_hip()
   CALL_SUBTEST(test_hip_erf<float>(0.001f));
 
   CALL_SUBTEST(test_hip_erfc<float>(1.0f));
-  // CALL_SUBTEST(test_hip_erfc<float>(100.0f));
-  CALL_SUBTEST(test_hip_erfc<float>(5.0f)); // HIP erfc lacks precision for large inputs
+  // CALL_SUBTEST(test_hip_erfc<float>(100.0f)); // HIP erfc lacks precision for large inputs
+  CALL_SUBTEST(test_hip_erfc<float>(5.0f)); 
   CALL_SUBTEST(test_hip_erfc<float>(0.01f));
   CALL_SUBTEST(test_hip_erfc<float>(0.001f));
 
@@ -1269,8 +1267,8 @@ void test_cxx11_tensor_hip()
   CALL_SUBTEST(test_hip_erf<double>(0.001));
 
   CALL_SUBTEST(test_hip_erfc<double>(1.0));
-  // CALL_SUBTEST(test_hip_erfc<double>(100.0));
-  CALL_SUBTEST(test_hip_erfc<double>(5.0)); // HIP erfc lacks precision for large inputs
+  // CALL_SUBTEST(test_hip_erfc<double>(100.0)); // HIP erfc lacks precision for large inputs
+  CALL_SUBTEST(test_hip_erfc<double>(5.0)); 
   CALL_SUBTEST(test_hip_erfc<double>(0.01));
   CALL_SUBTEST(test_hip_erfc<double>(0.001));
 
@@ -1289,12 +1287,10 @@ void test_cxx11_tensor_hip()
   CALL_SUBTEST(test_hip_igamma<float>());
   CALL_SUBTEST(test_hip_igammac<float>());
 
-  // Following tests have functional failures on some seeds
-  // CALL_SUBTEST(test_hip_igamma<double>());
-  // CALL_SUBTEST(test_hip_igammac<double>());
+  CALL_SUBTEST(test_hip_igamma<double>());
+  CALL_SUBTEST(test_hip_igammac<double>());
 
-  // Following tests have functional failures on some seeds
-  // CALL_SUBTEST(test_hip_betainc<float>());
-  // CALL_SUBTEST(test_hip_betainc<double>());
+  CALL_SUBTEST(test_hip_betainc<float>());
+  CALL_SUBTEST(test_hip_betainc<double>());
 #endif
 }
