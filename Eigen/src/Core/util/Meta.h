@@ -11,16 +11,19 @@
 #ifndef EIGEN_META_H
 #define EIGEN_META_H
 
-#if defined(EIGEN_CUDA_ARCH)
-#include <cfloat>
-#include <math_constants.h>
-#endif
+#if defined(EIGEN_GPU_COMPILE_PHASE)
 
-#if defined(EIGEN_HIP_DEVICE_COMPILE)
-#include <cfloat>
-#include "Eigen/src/Core/arch/HIP/hcc/math_constants.h"
-#endif
+ #include <cfloat>
 
+ #if defined(EIGEN_CUDA_ARCH)
+  #include <math_constants.h>
+ #endif
+
+ #if defined(EIGEN_HIP_DEVICE_COMPILE)
+  #include "Eigen/src/Core/arch/HIP/hcc/math_constants.h"
+  #endif
+
+#endif
 
 #if EIGEN_COMP_ICC>=1600 &&  __cplusplus >= 201103L
 #include <cstdint>
@@ -181,7 +184,7 @@ template<bool Condition, typename T=void> struct enable_if;
 template<typename T> struct enable_if<true,T>
 { typedef T type; };
 
-#if defined(EIGEN_CUDA_ARCH) || defined(EIGEN_HIP_DEVICE_COMPILE)
+#if defined(EIGEN_GPU_COMPILE_PHASE)
 #if !defined(__FLT_EPSILON__)
 #define __FLT_EPSILON__ FLT_EPSILON
 #define __DBL_EPSILON__ DBL_EPSILON
@@ -565,13 +568,13 @@ template<typename T, typename U> struct scalar_product_traits
 
 namespace numext {
   
-#if defined(EIGEN_CUDA_ARCH) || defined(EIGEN_HIP_DEVICE_COMPILE)
+#if defined(EIGEN_GPU_COMPILE_PHASE)
 template<typename T> EIGEN_DEVICE_FUNC   void swap(T &a, T &b) { T tmp = b; b = a; a = tmp; }
 #else
 template<typename T> EIGEN_STRONG_INLINE void swap(T &a, T &b) { std::swap(a,b); }
 #endif
 
-#if defined(EIGEN_CUDA_ARCH) || defined(EIGEN_HIP_DEVICE_COMPILE)
+#if defined(EIGEN_GPU_COMPILE_PHASE)
 using internal::device::numeric_limits;
 #else
 using std::numeric_limits;

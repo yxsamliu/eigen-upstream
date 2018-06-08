@@ -99,6 +99,61 @@
 #define EIGEN_DONT_VECTORIZE
 #endif
 
+
+#if defined(EIGEN_CUDACC) || defined(EIGEN_HIPCC)
+//
+// If either EIGEN_CUDACC or EIGEN_HIPCC is defined, then define EIGEN_GPUCC
+//
+#define EIGEN_GPUCC
+//
+// EIGEN_HIPCC implies the HIP compiler and is used to tweak Eigen code for use in HIP kernels
+// EIGEN_CUDACC implies the CUDA compiler and is used to tweak Eigen code for use in CUDA kernels
+//
+// In most cases the same tweaks are required to the Eigen code to enable in both the HIP and CUDA kernels.
+// For those cases, the corresponding code should be guarded with
+//      #if defined(EIGEN_GPUCC)
+// instead of
+//      #if defined(EIGEN_CUDACC) || defined(EIGEN_HIPCC)
+//
+// For cases where the tweak is specific to HIP, the code should be guarded with
+//      #if defined(EIGEN_HIPCC)
+//
+// For cases where the tweak is specific to CUDA, the code should be guarded with
+//      #if defined(EIGEN_CUDACC)
+//
+#endif
+
+#if defined(EIGEN_CUDA_ARCH) || defined(EIGEN_HIP_DEVICE_COMPILE)
+//
+// If either EIGEN_CUDA_ARCH or EIGEN_HIP_DEVICE_COMPILE is defined, then define EIGEN_GPU_COMPILE_PHASE
+//
+#define EIGEN_GPU_COMPILE_PHASE
+//
+// GPU compilers (HIPCC, NVCC) typically do two passes over the source code,
+//   + one to compile the source for the "host" (ie CPU)
+//   + another to compile the source for the "device" (ie. GPU)
+// 
+// Code that needs to enabled only during the either the "host" or "device" compilation phase
+// needs to be guarded with a macro that indicates the current compilation phase
+//
+// EIGEN_HIP_DEVICE_COMPILE implies the device compilation phase in HIP
+// EIGEN_CUDA_ARCH implies the device compilation phase in CUDA
+//
+// In most cases, the "host" / "device" specific code is the same for both HIP and CUDA
+// For those cases, the code should be guarded with
+//       #if defined(EIGEN_GPU_COMPILE_PHASE)
+// instead of
+//       #if defined(EIGEN_CUDA_ARCH) || defined(EIGEN_HIP_DEVICE_COMPILE)
+//
+// For cases where the tweak is specific to HIP, the code should be guarded with
+//      #if defined(EIGEN_HIP_DEVICE_COMPILE)
+//
+// For cases where the tweak is specific to CUDA, the code should be guarded with
+//      #if defined(EIGEN_CUDA_ARCH)
+//
+#endif
+
+
 // When compiling CUDA device code with NVCC, or HIP device code with HIPCC
 // pull in math functions from the global namespace.  In host mode, and when
 // device doee with clang, use the std versions.
