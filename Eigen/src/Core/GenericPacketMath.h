@@ -299,13 +299,11 @@ template<typename Scalar, typename Packet> EIGEN_DEVICE_FUNC inline void pstoreu
  { pstore(to, from); }
 
 /** \internal tries to do cache prefetching of \a addr */
-template<typename Scalar>
-  #if !defined(EIGEN_HIPCC)
-  EIGEN_DEVICE_FUNC
-  #endif
-  inline void prefetch(const Scalar* addr)
+template<typename Scalar> EIGEN_DEVICE_FUNC inline void prefetch(const Scalar* addr)
 {
-#ifdef EIGEN_CUDA_ARCH
+#if defined(EIGEN_HIP_DEVICE_COMPILE)
+  // do nothing
+#elif defined(EIGEN_CUDA_ARCH)
 #if defined(__LP64__)
   // 64-bit pointer operand constraint for inlined asm
   asm(" prefetch.L1 [ %1 ];" : "=l"(addr) : "l"(addr));
