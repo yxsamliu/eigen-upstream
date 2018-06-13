@@ -140,7 +140,7 @@ struct half : public half_impl::half_base {
  #if defined(EIGEN_HAS_HIP_FP16)
   EIGEN_DEVICE_FUNC half(const __half& h) : half_impl::half_base(h) {}
  #elif defined(EIGEN_HAS_CUDA_FP16)
-  #if defined(EIGEN_CUDACC_VER) && EIGEN_CUDACC_VER >= 90000)
+  #if defined(EIGEN_CUDACC_VER) && EIGEN_CUDACC_VER >= 90000
   EIGEN_DEVICE_FUNC half(const __half& h) : half_impl::half_base(h) {}
   #endif
  #endif
