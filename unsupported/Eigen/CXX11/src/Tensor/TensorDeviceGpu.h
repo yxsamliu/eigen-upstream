@@ -35,6 +35,7 @@
 #define gpuSharedMemConfig hipSharedMemConfig
 #define gpuDeviceSetSharedMemConfig hipDeviceSetSharedMemConfig
 #define gpuStreamSynchronize hipStreamSynchronize
+#define gpuSharedMemBankSizeEightByte hipSharedMemBankSizeEightByte
 
 #else
 
@@ -60,6 +61,7 @@
 #define gpuSharedMemConfig cudaSharedMemConfig
 #define gpuDeviceSetSharedMemConfig cudaDeviceSetSharedMemConfig
 #define gpuStreamSynchronize cudaStreamSynchronize
+#define gpuSharedMemBankSizeEightByte cudaSharedMemBankSizeEightByte
 
 #endif
 
