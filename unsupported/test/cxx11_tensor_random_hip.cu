@@ -27,7 +27,7 @@ void test_hip_random_uniform()
   float* d_out;
   hipMalloc((void**)(&d_out), out_bytes);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 2> > gpu_out(d_out, 72,97);
@@ -52,7 +52,7 @@ void test_hip_random_normal()
   float* d_out;
   hipMalloc((void**)(&d_out), out_bytes);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 2> > gpu_out(d_out, 72,97);

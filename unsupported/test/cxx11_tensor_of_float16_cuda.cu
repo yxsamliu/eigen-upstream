@@ -21,7 +21,7 @@ using Eigen::Tensor;
 
 template<typename>
 void test_cuda_numext() {
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = 101;
 
@@ -61,7 +61,7 @@ void test_cuda_numext() {
 
 template<typename>
 void test_cuda_conversion() {
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = 101;
   
@@ -96,7 +96,7 @@ void test_cuda_conversion() {
 
 template<typename>
 void test_cuda_unary() {
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = 101;
 
@@ -133,7 +133,7 @@ void test_cuda_unary() {
 
 template<typename>
 void test_cuda_elementwise() {
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = 101;
 
@@ -175,7 +175,7 @@ void test_cuda_elementwise() {
 
 template<typename>
 void test_cuda_trancendental() {
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = 101;
 
@@ -269,7 +269,7 @@ void test_cuda_trancendental() {
 
 template<typename>
 void test_cuda_contractions() {
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int rows = 23;
   int cols = 23;
@@ -324,7 +324,7 @@ void test_cuda_reductions(int size1, int size2, int redux) {
    std::cout << "Reducing " << size1 << " by " << size2
              << " tensor along dim " << redux << std::endl; 
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = size1*size2;
   int result_size = (redux == 1 ? size1 : size2);
@@ -381,7 +381,7 @@ void test_cuda_reductions() {
 
 template<typename>
 void test_cuda_full_reductions() {
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int size = 13;
   int num_elem = size*size;
@@ -431,7 +431,7 @@ void test_cuda_full_reductions() {
 template<typename>
 void test_cuda_forced_evals() {
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = 101;
 

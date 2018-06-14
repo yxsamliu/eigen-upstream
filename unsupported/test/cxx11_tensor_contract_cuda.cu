@@ -52,7 +52,7 @@ void test_cuda_contraction(int m_size, int k_size, int n_size)
   cudaMemcpy(d_t_left, t_left.data(), t_left_bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_t_right, t_right.data(), t_right_bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 2, DataLayout> >
@@ -116,7 +116,7 @@ void test_scalar(int m_size, int k_size, int n_size)
   cudaMemcpy(d_t_left, t_left.data(), t_left_bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_t_right, t_right.data(), t_right_bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 2, DataLayout> >

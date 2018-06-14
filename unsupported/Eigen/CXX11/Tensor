@@ -99,11 +99,7 @@ typedef unsigned __int64 uint64_t;
 #include "src/Tensor/TensorCostModel.h"
 #include "src/Tensor/TensorDeviceDefault.h"
 #include "src/Tensor/TensorDeviceThreadPool.h"
-#if defined(EIGEN_USE_HIP)
-  #include "src/Tensor/TensorDeviceHip.h"
-#else
-  #include "src/Tensor/TensorDeviceCuda.h"
-#endif
+#include "src/Tensor/TensorDeviceGpu.h"
 #include "src/Tensor/TensorDeviceSycl.h"
 #include "src/Tensor/TensorIndexList.h"
 #include "src/Tensor/TensorDimensionList.h"

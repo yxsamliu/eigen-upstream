@@ -1510,7 +1510,7 @@ struct TensorEvaluator<const TensorContractionOp<Indices, LeftArgType, RightArgT
 
     OutputMapper output(buffer, m);
 
-    setHipSharedMemConfig(hipSharedMemBankSizeEightByte);
+    setGpuSharedMemConfig(hipSharedMemBankSizeEightByte);
     LaunchKernels<LhsScalar, RhsScalar, Index, LhsMapper, RhsMapper, OutputMapper>::Run(lhs, rhs, output,  m, n, k, this->m_device);
   }
 };

@@ -623,16 +623,16 @@ struct InnerReductionLauncher<
     const int block_size = 256;
     const int num_per_thread = 128;
     const int dyn_blocks = divup<int>(num_coeffs, block_size * num_per_thread);
-    const int max_blocks = device.getNumHipMultiProcessors() *
-                           device.maxHipThreadsPerMultiProcessor() / block_size;
+    const int max_blocks = device.getNumGpuMultiProcessors() *
+                           device.maxGpuThreadsPerMultiProcessor() / block_size;
     const int num_blocks = numext::mini<int>(max_blocks, dyn_blocks);
 
     if (num_blocks > 1) {
       // We initialize the outputs outside the reduction kernel when we can't be sure that there
       // won't be a race conditions between multiple thread blocks.
       const int dyn_blocks = divup<int>(num_preserved_vals, 1024);
-      const int max_blocks = device.getNumHipMultiProcessors() *
-                           device.maxHipThreadsPerMultiProcessor() / 1024;
+      const int max_blocks = device.getNumGpuMultiProcessors() *
+                           device.maxGpuThreadsPerMultiProcessor() / 1024;
       const int num_blocks = numext::mini<int>(max_blocks, dyn_blocks);
       hipLaunchKernelGGL(HIP_KERNEL_NAME(ReductionInitKernel<OutputType, Index>),
                          dim3(num_blocks), dim3(1024), 0, device.stream(),
@@ -670,16 +670,16 @@ struct InnerReductionLauncher<Self, Op, Eigen::half, true> {
     const int block_size = /*256*/128;
     const int num_per_thread = /*128*/64;
     const int dyn_blocks = divup<int>(num_coeffs, block_size * num_per_thread);
-    const int max_blocks = device.getNumHipMultiProcessors() *
-                           device.maxHipThreadsPerMultiProcessor() / block_size;
+    const int max_blocks = device.getNumGpuMultiProcessors() *
+                           device.maxGpuThreadsPerMultiProcessor() / block_size;
     const int num_blocks = numext::mini<int>(max_blocks, dyn_blocks);
 
     if (num_blocks > 1) {
       // We initialize the outputs outside the reduction kernel when we can't be sure that there
       // won't be a race conditions between multiple thread blocks.
       const int dyn_blocks = divup<int>(num_preserved_vals, 1024);
-      const int max_blocks = device.getNumHipMultiProcessors() *
-                           device.maxHipThreadsPerMultiProcessor() / 1024;
+      const int max_blocks = device.getNumGpuMultiProcessors() *
+                           device.maxGpuThreadsPerMultiProcessor() / 1024;
       const int num_blocks = numext::mini<int>(max_blocks, dyn_blocks);
       hipLaunchKernelGGL(HIP_KERNEL_NAME(ReductionInitKernelHalfFloat<Self, Op, Index>),
                          dim3(1), dim3(1), 0, device.stream(), reducer, self, num_preserved_vals, output);
@@ -783,16 +783,16 @@ struct OuterReducer<Self, Op, GpuDevice> {
     const int block_size = 256;
     const int num_per_thread = 16;
     const int dyn_blocks = divup<int>(num_coeffs, block_size * num_per_thread);
-    const int max_blocks = device.getNumHipMultiProcessors() *
-                           device.maxHipThreadsPerMultiProcessor() / block_size;
+    const int max_blocks = device.getNumGpuMultiProcessors() *
+                           device.maxGpuThreadsPerMultiProcessor() / block_size;
     const int num_blocks = numext::mini<int>(max_blocks, dyn_blocks);
 
     if (num_blocks > 1) {
       // We initialize the outputs in the reduction kernel itself when we don't have to worry
       // about race conditions between multiple thread blocks.
       const int dyn_blocks = divup<int>(num_preserved_vals, 1024);
-      const int max_blocks = device.getNumHipMultiProcessors() *
-                             device.maxHipThreadsPerMultiProcessor() / 1024;
+      const int max_blocks = device.getNumGpuMultiProcessors() *
+                             device.maxGpuThreadsPerMultiProcessor() / 1024;
       const int num_blocks = numext::mini<int>(max_blocks, dyn_blocks);
       hipLaunchKernelGGL(HIP_KERNEL_NAME(ReductionInitKernel<float, Index>),
                          dim3(num_blocks), dim3(1024), 0, device.stream(),

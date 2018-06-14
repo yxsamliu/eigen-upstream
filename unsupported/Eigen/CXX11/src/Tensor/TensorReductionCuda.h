@@ -308,7 +308,7 @@ struct FullReductionLauncher<
       semaphore = device.semaphore();
     }
 
-    LAUNCH_CUDA_KERNEL((FullReductionKernel<block_size, num_per_thread, Self, Op, Index>),
+    LAUNCH_GPU_KERNEL((FullReductionKernel<block_size, num_per_thread, Self, Op, Index>),
                        num_blocks, block_size, 0, device, reducer, self, num_coeffs, output, semaphore);
   }
 };
@@ -334,15 +334,15 @@ struct FullReductionLauncher<Self, Op, Eigen::half, true> {
     if (num_blocks > 1) {
       // We initialize the output and the scrathpad outside the reduction kernel when we can't be sure that there
       // won't be a race conditions between multiple thread blocks.
-      LAUNCH_CUDA_KERNEL((ReductionInitFullReduxKernelHalfFloat<Self, Op, Index>),
+      LAUNCH_GPU_KERNEL((ReductionInitFullReduxKernelHalfFloat<Self, Op, Index>),
                          1, 1, 0, device, reducer, self, num_coeffs, scratch);
     }
 
-    LAUNCH_CUDA_KERNEL((FullReductionKernelHalfFloat<block_size, num_per_thread, Self, Op, Index>),
+    LAUNCH_GPU_KERNEL((FullReductionKernelHalfFloat<block_size, num_per_thread, Self, Op, Index>),
                        num_blocks, block_size, 0, device, reducer, self, num_coeffs, output, scratch);
 
     if (num_blocks > 1) {
-      LAUNCH_CUDA_KERNEL((ReductionCleanupKernelHalfFloat<Op>),
+      LAUNCH_GPU_KERNEL((ReductionCleanupKernelHalfFloat<Op>),
                          1, 1, 0, device, reducer, output, scratch);
     }
   }
@@ -581,23 +581,23 @@ struct InnerReductionLauncher<
     const int block_size = 256;
     const int num_per_thread = 128;
     const int dyn_blocks = divup<int>(num_coeffs, block_size * num_per_thread);
-    const int max_blocks = device.getNumCudaMultiProcessors() *
-                           device.maxCudaThreadsPerMultiProcessor() / block_size;
+    const int max_blocks = device.getNumGpuMultiProcessors() *
+                           device.maxGpuThreadsPerMultiProcessor() / block_size;
     const int num_blocks = numext::mini<int>(max_blocks, dyn_blocks);
 
     if (num_blocks > 1) {
       // We initialize the outputs outside the reduction kernel when we can't be sure that there
       // won't be a race conditions between multiple thread blocks.
       const int dyn_blocks = divup<int>(num_preserved_vals, 1024);
-      const int max_blocks = device.getNumCudaMultiProcessors() *
-                           device.maxCudaThreadsPerMultiProcessor() / 1024;
+      const int max_blocks = device.getNumGpuMultiProcessors() *
+                           device.maxGpuThreadsPerMultiProcessor() / 1024;
       const int num_blocks = numext::mini<int>(max_blocks, dyn_blocks);
-      LAUNCH_CUDA_KERNEL((ReductionInitKernel<OutputType, Index>),
+      LAUNCH_GPU_KERNEL((ReductionInitKernel<OutputType, Index>),
                          num_blocks, 1024, 0, device, reducer.initialize(),
                          num_preserved_vals, output);
     }
 
-    LAUNCH_CUDA_KERNEL((InnerReductionKernel<num_per_thread, Self, Op, Index>),
+    LAUNCH_GPU_KERNEL((InnerReductionKernel<num_per_thread, Self, Op, Index>),
                        num_blocks, block_size, 0, device, reducer, self, num_coeffs_to_reduce, num_preserved_vals, output);
 
     return false;
@@ -627,22 +627,22 @@ struct InnerReductionLauncher<Self, Op, Eigen::half, true> {
     const int block_size = /*256*/128;
     const int num_per_thread = /*128*/64;
     const int dyn_blocks = divup<int>(num_coeffs, block_size * num_per_thread);
-    const int max_blocks = device.getNumCudaMultiProcessors() *
-                           device.maxCudaThreadsPerMultiProcessor() / block_size;
+    const int max_blocks = device.getNumGpuMultiProcessors() *
+                           device.maxGpuThreadsPerMultiProcessor() / block_size;
     const int num_blocks = numext::mini<int>(max_blocks, dyn_blocks);
 
     if (num_blocks > 1) {
       // We initialize the outputs outside the reduction kernel when we can't be sure that there
       // won't be a race conditions between multiple thread blocks.
       const int dyn_blocks = divup<int>(num_preserved_vals, 1024);
-      const int max_blocks = device.getNumCudaMultiProcessors() *
-                           device.maxCudaThreadsPerMultiProcessor() / 1024;
+      const int max_blocks = device.getNumGpuMultiProcessors() *
+                           device.maxGpuThreadsPerMultiProcessor() / 1024;
       const int num_blocks = numext::mini<int>(max_blocks, dyn_blocks);
-      LAUNCH_CUDA_KERNEL((ReductionInitKernelHalfFloat<Self, Op, Index>),
+      LAUNCH_GPU_KERNEL((ReductionInitKernelHalfFloat<Self, Op, Index>),
                          1, 1, 0, device, reducer, self, num_preserved_vals, output);
     }
 
-    LAUNCH_CUDA_KERNEL((InnerReductionKernelHalfFloat<num_per_thread, Self, Op, Index>),
+    LAUNCH_GPU_KERNEL((InnerReductionKernelHalfFloat<num_per_thread, Self, Op, Index>),
                        num_blocks, block_size, 0, device, reducer, self, num_coeffs_to_reduce, num_preserved_vals, output);
 
     return false;
@@ -740,23 +740,23 @@ struct OuterReducer<Self, Op, GpuDevice> {
     const int block_size = 256;
     const int num_per_thread = 16;
     const int dyn_blocks = divup<int>(num_coeffs, block_size * num_per_thread);
-    const int max_blocks = device.getNumCudaMultiProcessors() *
-                           device.maxCudaThreadsPerMultiProcessor() / block_size;
+    const int max_blocks = device.getNumGpuMultiProcessors() *
+                           device.maxGpuThreadsPerMultiProcessor() / block_size;
     const int num_blocks = numext::mini<int>(max_blocks, dyn_blocks);
 
     if (num_blocks > 1) {
       // We initialize the outputs in the reduction kernel itself when we don't have to worry
       // about race conditions between multiple thread blocks.
       const int dyn_blocks = divup<int>(num_preserved_vals, 1024);
-      const int max_blocks = device.getNumCudaMultiProcessors() *
-                             device.maxCudaThreadsPerMultiProcessor() / 1024;
+      const int max_blocks = device.getNumGpuMultiProcessors() *
+                             device.maxGpuThreadsPerMultiProcessor() / 1024;
       const int num_blocks = numext::mini<int>(max_blocks, dyn_blocks);
-      LAUNCH_CUDA_KERNEL((ReductionInitKernel<float, Index>),
+      LAUNCH_GPU_KERNEL((ReductionInitKernel<float, Index>),
                          num_blocks, 1024, 0, device, reducer.initialize(),
                          num_preserved_vals, output);
     }
 
-    LAUNCH_CUDA_KERNEL((OuterReductionKernel<num_per_thread, Self, Op, Index>),
+    LAUNCH_GPU_KERNEL((OuterReductionKernel<num_per_thread, Self, Op, Index>),
                        num_blocks, block_size, 0, device, reducer, self, num_coeffs_to_reduce, num_preserved_vals, output);
 
     return false;

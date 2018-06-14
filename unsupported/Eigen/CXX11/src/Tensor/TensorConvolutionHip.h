@@ -857,9 +857,9 @@ struct TensorEvaluator<const TensorConvolutionOp<Indices, InputArgType, KernelAr
     typedef typename TensorEvaluator<InputArgType, GpuDevice>::Dimensions InputDims;
 
     const int maxSharedMem = m_device.sharedMemPerBlock();
-    const int maxThreadsPerBlock = m_device.maxHipThreadsPerBlock();
-    const int maxBlocksPerProcessor = m_device.maxHipThreadsPerMultiProcessor() / maxThreadsPerBlock;
-    const int numMultiProcessors = m_device.getNumHipMultiProcessors();
+    const int maxThreadsPerBlock = m_device.maxGpuThreadsPerBlock();
+    const int maxBlocksPerProcessor = m_device.maxGpuThreadsPerMultiProcessor() / maxThreadsPerBlock;
+    const int numMultiProcessors = m_device.getNumGpuMultiProcessors();
     const int hipWarpSize = 32;
 
     switch (NumKernelDims) {

@@ -40,7 +40,7 @@ void test_hip_cumsum(int m_size, int k_size, int n_size)
 
   hipMemcpy(d_t_input, t_input.data(), t_input_bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 3, DataLayout> >

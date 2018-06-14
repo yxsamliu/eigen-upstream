@@ -40,7 +40,7 @@ void test_cuda_simple_argmax()
 
   cudaMemcpy(d_in, in.data(), in_bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<double, 3, Layout>, Aligned > gpu_in(d_in, Eigen::array<DenseIndex, 3>(72,53,97));
@@ -102,7 +102,7 @@ void test_cuda_argmax_dim()
 
     cudaMemcpy(d_in, tensor.data(), in_bytes, cudaMemcpyHostToDevice);
 
-    Eigen::CudaStreamDevice stream;
+    Eigen::GpuStreamDevice stream;
     Eigen::GpuDevice gpu_device(&stream);
 
     Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout>, Aligned > gpu_in(d_in, Eigen::array<DenseIndex, 4>(2, 3, 5, 7));
@@ -191,7 +191,7 @@ void test_cuda_argmin_dim()
 
     cudaMemcpy(d_in, tensor.data(), in_bytes, cudaMemcpyHostToDevice);
 
-    Eigen::CudaStreamDevice stream;
+    Eigen::GpuStreamDevice stream;
     Eigen::GpuDevice gpu_device(&stream);
 
     Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout>, Aligned > gpu_in(d_in, Eigen::array<DenseIndex, 4>(2, 3, 5, 7));

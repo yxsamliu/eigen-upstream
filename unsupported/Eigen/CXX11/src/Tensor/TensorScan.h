@@ -282,7 +282,7 @@ struct ScanLauncher<Self, Reducer, GpuDevice> {
      hipLaunchKernelGGL(HIP_KERNEL_NAME(ScanKernel<Self, Reducer>), dim3(num_blocks),
 			dim3(block_size), 0, self.device().stream(), self, total_size, data);
 #else
-     LAUNCH_CUDA_KERNEL((ScanKernel<Self, Reducer>), num_blocks, block_size, 0, self.device(), self, total_size, data);
+     LAUNCH_GPU_KERNEL((ScanKernel<Self, Reducer>), num_blocks, block_size, 0, self.device(), self, total_size, data);
 #endif     
   }
 };

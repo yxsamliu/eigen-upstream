@@ -37,7 +37,7 @@ void test_hip_nullary() {
   hipMemcpy(d_in1, in1.data(), tensor_bytes, hipMemcpyHostToDevice);
   hipMemcpy(d_in2, in2.data(), tensor_bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 1, 0, int>, Eigen::Aligned> gpu_in1(
@@ -88,7 +88,7 @@ void test_hip_elementwise_small() {
   hipMemcpy(d_in1, in1.data(), in1_bytes, hipMemcpyHostToDevice);
   hipMemcpy(d_in2, in2.data(), in2_bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 1>, Eigen::Aligned> gpu_in1(
@@ -143,7 +143,7 @@ void test_hip_elementwise()
   hipMemcpy(d_in2, in2.data(), in2_bytes, hipMemcpyHostToDevice);
   hipMemcpy(d_in3, in3.data(), in3_bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 3> > gpu_in1(d_in1, Eigen::array<Eigen::DenseIndex, 3>{72,53,97});
@@ -185,7 +185,7 @@ void test_hip_props() {
 
   hipMemcpy(d_in1, in1.data(), in1_bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 1>, Eigen::Aligned> gpu_in1(
@@ -223,7 +223,7 @@ void test_hip_reduction()
 
   hipMemcpy(d_in1, in1.data(), in1_bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 4> > gpu_in1(d_in1, 72,53,97,113);
@@ -283,7 +283,7 @@ void test_hip_contraction()
   hipMemcpy(d_t_left, t_left.data(), t_left_bytes, hipMemcpyHostToDevice);
   hipMemcpy(d_t_right, t_right.data(), t_right_bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout> > gpu_t_left(d_t_left, 6, 50, 3, 31);
@@ -341,7 +341,7 @@ void test_hip_convolution_1d()
   hipMemcpy(d_input, input.data(), input_bytes, hipMemcpyHostToDevice);
   hipMemcpy(d_kernel, kernel.data(), kernel_bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout> > gpu_input(d_input, 74,37,11,137);
@@ -394,7 +394,7 @@ void test_hip_convolution_inner_dim_col_major_1d()
   hipMemcpy(d_input, input.data(), input_bytes, hipMemcpyHostToDevice);
   hipMemcpy(d_kernel, kernel.data(), kernel_bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 4, ColMajor> > gpu_input(d_input,74,9,11,7);
@@ -447,7 +447,7 @@ void test_hip_convolution_inner_dim_row_major_1d()
   hipMemcpy(d_input, input.data(), input_bytes, hipMemcpyHostToDevice);
   hipMemcpy(d_kernel, kernel.data(), kernel_bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 4, RowMajor> > gpu_input(d_input, 7,9,11,74);
@@ -501,7 +501,7 @@ void test_hip_convolution_2d()
   hipMemcpy(d_input, input.data(), input_bytes, hipMemcpyHostToDevice);
   hipMemcpy(d_kernel, kernel.data(), kernel_bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout> > gpu_input(d_input,74,37,11,137);
@@ -565,7 +565,7 @@ void test_hip_convolution_3d()
   hipMemcpy(d_input, input.data(), input_bytes, hipMemcpyHostToDevice);
   hipMemcpy(d_kernel, kernel.data(), kernel_bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;    
+  Eigen::GpuStreamDevice stream;    
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 5, DataLayout> > gpu_input(d_input,74,37,11,137,17);
@@ -639,7 +639,7 @@ void test_hip_lgamma(const Scalar stddev)
 
   hipMemcpy(d_in, in.data(), bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 2> > gpu_in(d_in, 72, 97);
@@ -693,7 +693,7 @@ void test_hip_digamma()
 
   hipMemcpy(d_in, in.data(), bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 1> > gpu_in(d_in, 7);
@@ -757,7 +757,7 @@ void test_hip_zeta()
   hipMemcpy(d_in_x, in_x.data(), bytes, hipMemcpyHostToDevice);
   hipMemcpy(d_in_q, in_q.data(), bytes, hipMemcpyHostToDevice);
   
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 1> > gpu_in_x(d_in_x, 6);
@@ -828,7 +828,7 @@ void test_hip_polygamma()
   hipMemcpy(d_in_x, in_x.data(), bytes, hipMemcpyHostToDevice);
   hipMemcpy(d_in_n, in_n.data(), bytes, hipMemcpyHostToDevice);
   
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 1> > gpu_in_x(d_in_x, 7);
@@ -893,7 +893,7 @@ void test_hip_igamma()
   hipMemcpy(d_a, a.data(), bytes, hipMemcpyHostToDevice);
   hipMemcpy(d_x, x.data(), bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 2> > gpu_a(d_a, 6, 6);
@@ -963,7 +963,7 @@ void test_hip_igammac()
   hipMemcpy(d_a, a.data(), bytes, hipMemcpyHostToDevice);
   hipMemcpy(d_x, x.data(), bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 2> > gpu_a(d_a, 6, 6);
@@ -1008,7 +1008,7 @@ void test_hip_erf(const Scalar stddev)
 
   hipMemcpy(d_in, in.data(), bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 2> > gpu_in(d_in, 72, 97);
@@ -1047,7 +1047,7 @@ void test_hip_erfc(const Scalar stddev)
 
   hipMemcpy(d_in, in.data(), bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 2> > gpu_in(d_in, 72, 97);
@@ -1187,7 +1187,7 @@ void test_hip_betainc()
   hipMemcpy(d_in_a, in_a.data(), bytes, hipMemcpyHostToDevice);
   hipMemcpy(d_in_b, in_b.data(), bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 1> > gpu_in_x(d_in_x, 125);
@@ -1250,7 +1250,7 @@ void test_hip_i0e()
 
   hipMemcpy(d_in, in_x.data(), bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 1> > gpu_in(d_in, 21);
@@ -1305,7 +1305,7 @@ void test_hip_i1e()
 
   hipMemcpy(d_in, in_x.data(), bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 1> > gpu_in(d_in, 21);
