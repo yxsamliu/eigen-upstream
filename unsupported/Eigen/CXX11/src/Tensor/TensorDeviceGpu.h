@@ -10,67 +10,10 @@
 #if defined(EIGEN_USE_GPU) && !defined(EIGEN_CXX11_TENSOR_TENSOR_DEVICE_GPU_H)
 #define EIGEN_CXX11_TENSOR_TENSOR_DEVICE_GPU_H
 
-#if defined(EIGEN_HIPCC)
-
-#define gpuStream_t hipStream_t
-#define gpuDeviceProp_t hipDeviceProp_t
-#define gpuError_t hipError_t
-#define gpuSuccess hipSuccess
-#define gpuErrorNotReady hipErrorNotReady
-#define gpuGetDeviceCount hipGetDeviceCount
-#define gpuGetErrorString hipGetErrorString
-#define gpuGetDeviceProperties hipGetDeviceProperties
-// FIXME : use hipStreamDefault instead of 0x00
-#define gpuStreamDefault 0x00
-#define gpuGetDevice hipGetDevice
-#define gpuSetDevice hipSetDevice
-#define gpuMalloc hipMalloc
-#define gpuFree hipFree
-#define gpuMemsetAsync hipMemsetAsync
-#define gpuMemcpyAsync hipMemcpyAsync
-#define gpuMemcpyDeviceToDevice hipMemcpyDeviceToDevice
-#define gpuMemcpyDeviceToHost hipMemcpyDeviceToHost
-#define gpuMemcpyHostToDevice hipMemcpyHostToDevice
-#define gpuStreamQuery hipStreamQuery
-#define gpuSharedMemConfig hipSharedMemConfig
-#define gpuDeviceSetSharedMemConfig hipDeviceSetSharedMemConfig
-#define gpuStreamSynchronize hipStreamSynchronize
-#define gpuSharedMemBankSizeEightByte hipSharedMemBankSizeEightByte
-
-#else
-
-#define gpuStream_t cudaStream_t
-#define gpuDeviceProp_t cudaDeviceProp
-#define gpuError_t cudaError_t
-#define gpuSuccess cudaSuccess
-#define gpuErrorNotReady cudaErrorNotReady
-#define gpuGetDeviceCount cudaGetDeviceCount
-#define gpuGetErrorString cudaGetErrorString
-#define gpuGetDeviceProperties cudaGetDeviceProperties
-#define gpuStreamDefault cudaStreamDefault
-#define gpuGetDevice cudaGetDevice
-#define gpuSetDevice cudaSetDevice
-#define gpuMalloc cudaMalloc
-#define gpuFree cudaFree
-#define gpuMemsetAsync cudaMemsetAsync
-#define gpuMemcpyAsync cudaMemcpyAsync
-#define gpuMemcpyDeviceToDevice cudaMemcpyDeviceToDevice
-#define gpuMemcpyDeviceToHost cudaMemcpyDeviceToHost
-#define gpuMemcpyHostToDevice cudaMemcpyHostToDevice
-#define gpuStreamQuery cudaStreamQuery
-#define gpuSharedMemConfig cudaSharedMemConfig
-#define gpuDeviceSetSharedMemConfig cudaDeviceSetSharedMemConfig
-#define gpuStreamSynchronize cudaStreamSynchronize
-#define gpuSharedMemBankSizeEightByte cudaSharedMemBankSizeEightByte
-
-#endif
-
-
-#if defined(EIGEN_HIP_DEVICE_COMPILE)
-// HIPCC does not support the use of assert on the GPU side.
-#undef assert
-#define assert(COND)
-#endif
+// This header file container defines fo gpu* macros which will resolve to
+// their equivalent hip* or cuda* versions depending on the compiler in use
+// A separte header (included at the end of this file) will undefine all 
+#include "TensorGpuHipCudaDefines.h"
 
 namespace Eigen {
 
@@ -407,5 +350,8 @@ static EIGEN_DEVICE_FUNC inline void setGpuSharedMemConfig(gpuSharedMemConfig co
 #endif
 
 }  // end namespace Eigen
+
+// undefine all the gpu* macros we defined at the beginning of the file
+#include "TensorGpuHipCudaUndefines.h"
 
 #endif  // EIGEN_CXX11_TENSOR_TENSOR_DEVICE_GPU_H
