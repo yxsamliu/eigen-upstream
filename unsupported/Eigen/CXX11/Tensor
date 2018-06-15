@@ -116,11 +116,7 @@ typedef unsigned __int64 uint64_t;
 #include "src/Tensor/TensorEvaluator.h"
 #include "src/Tensor/TensorExpr.h"
 #include "src/Tensor/TensorReduction.h"
-#if defined(EIGEN_USE_HIP)
-  #include "src/Tensor/TensorReductionHip.h"
-#else
-  #include "src/Tensor/TensorReductionCuda.h"
-#endif
+#include "src/Tensor/TensorReductionGpu.h"
 #include "src/Tensor/TensorArgMax.h"
 #include "src/Tensor/TensorConcatenation.h"
 #include "src/Tensor/TensorContractionMapper.h"
