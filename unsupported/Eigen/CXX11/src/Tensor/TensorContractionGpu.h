@@ -1540,7 +1540,7 @@ struct TensorEvaluator<const TensorContractionOp<Indices, LeftArgType, RightArgT
 
     OutputMapper output(buffer, m);
 
-#if defined(EIGEN_HIPCC)
+#if defined(EIGEN_USE_HIP)
     setGpuSharedMemConfig(hipSharedMemBankSizeEightByte);
 #else
     setGpuSharedMemConfig(cudaSharedMemBankSizeEightByte);
