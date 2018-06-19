@@ -577,7 +577,7 @@ __global__ void EigenConvolutionKernel1D(
     const float* __restrict kernel, const int numPlanes, const int numX,
     const int maxX, const int kernelSize, float* buffer) {
 #if defined(EIGEN_HIPCC)
-  HIP_DYNAMIC_SHARED(  float, s)	    
+  HIP_DYNAMIC_SHARED(float, s)	    
 #else
   extern __shared__ float s[];
 #endif
@@ -630,7 +630,7 @@ __global__ void EigenConvolutionKernel2D(
     const int maxX, const int numY, const int maxY, const int kernelSizeX,
     const int kernelSizeY, float* buffer) {
 #if defined(EIGEN_HIPCC)
-  HIP_DYNAMIC_SHARED(  float, s)	    
+  HIP_DYNAMIC_SHARED(float, s)	    
 #else
   extern __shared__ float s[];
 #endif
@@ -702,7 +702,7 @@ __global__ void EigenConvolutionKernel3D(
     const size_t maxZ, const size_t kernelSizeX, const size_t kernelSizeY,
     const size_t kernelSizeZ, float* buffer) {
 #if defined(EIGEN_HIPCC)
-  HIP_DYNAMIC_SHARED(  float, s)	    
+  HIP_DYNAMIC_SHARED(float, s)	    
 #else
   extern __shared__ float s[];
 #endif

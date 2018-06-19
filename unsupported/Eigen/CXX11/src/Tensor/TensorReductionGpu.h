@@ -10,10 +10,6 @@
 #ifndef EIGEN_CXX11_TENSOR_TENSOR_REDUCTION_GPU_H
 #define EIGEN_CXX11_TENSOR_TENSOR_REDUCTION_GPU_H
 
-#if defined(EIGEN_HIPCC)
-#define warpSize (64)
-#endif
-
 namespace Eigen {
 namespace internal {
 
@@ -339,12 +335,6 @@ struct FullReductionLauncher {
   }
 };
 
-#if defined(EIGEN_HIPCC)
-namespace {
-  std::mutex __eigen_reduction_hip_mutex;
-}
-#endif
- 
 // Specialization for float and double
 template <typename Self, typename Op, typename OutputType, bool PacketAccess>
 struct FullReductionLauncher<
@@ -355,12 +345,6 @@ struct FullReductionLauncher<
     void>::type> {
   static void run(const Self& self, Op& reducer, const GpuDevice& device, OutputType* output, typename Self::Index num_coeffs) {
 
-#if defined(EIGEN_HIPCC)
-    // guard FullReductionLauncher with a mutex so only 1 FullReductionKernel
-    // is dispatched at a time
-    std::lock_guard<std::mutex> lock(__eigen_reduction_hip_mutex);
-#endif
-
     typedef typename Self::Index Index;
     const int block_size = 256;
     const int num_per_thread = 128;
@@ -369,29 +353,6 @@ struct FullReductionLauncher<
     unsigned int* semaphore = NULL;
     if (num_blocks > 1) {
       semaphore = device.semaphore();
-
-#if defined(EIGEN_HIPCC)
-      unsigned int semaphore_host = 0xFF;
-      hipMemcpy(&semaphore_host, semaphore, sizeof(unsigned int), hipMemcpyDeviceToHost);
-      if (semaphore_host != 0) {
-        std::cerr << "[WARN][EIGEN][FullReductionLauncher] incorrect semaphore value: "
-                  << semaphore_host << "\n";
-        // wait for all commands on the device to complete so semaphore value
-        // is reset to 0
-        hipDeviceSynchronize();
-
-        // read again
-        hipMemcpy(&semaphore_host, semaphore, sizeof(unsigned int), hipMemcpyDeviceToHost);
-        if (semaphore_host != 0) {
-          std::cerr << "[ERROR][EIGEN][FullReductionLauncher] CRITICAL incorrect semaphore value: "
-                    << semaphore_host << ", apply manual override to 0\n";
-
-          // force set semaphore value to be 0
-          semaphore_host = 0;
-          hipMemcpy(semaphore, &semaphore_host, sizeof(unsigned int), hipMemcpyHostToDevice);
-        }
-      }
-#endif
     }
 
     LAUNCH_GPU_KERNEL((FullReductionKernel<block_size, num_per_thread, Self, Op, Index>),
@@ -830,12 +791,14 @@ struct OuterReducer<Self, Op, GpuDevice> {
   static
     #if !defined(EIGEN_HIPCC)
     // FIXME :  leaving this EIGEN_DEVICE_FUNC in, results in the following runtime error
-    //          (in the cxx11_tensor_reduction_hip test)
+    //          (in the cxx11_tensor_reduction_gpu test)
     //
     // terminate called after throwing an instance of 'std::runtime_error'
     //   what():  No device code available for function: _ZN5Eigen8internal20OuterReductionKernelIL...
     //
     // dont know why this happens (and why is it a runtime error instead of a compile time errror)
+    //
+    // this will be fixed by HIP PR#457
     EIGEN_DEVICE_FUNC
     #endif
     bool run(const Self&, Op&, const Device&, OutputType*, typename Self::Index, typename Self::Index) {
