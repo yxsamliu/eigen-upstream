@@ -102,7 +102,7 @@ struct GPUContext {
   float* kernel_2d_;
   float* kernel_3d_;
 
-  Eigen::CudaStreamDevice stream_;
+  Eigen::GpuStreamDevice stream_;
   Eigen::GpuDevice gpu_device_;
 };
 

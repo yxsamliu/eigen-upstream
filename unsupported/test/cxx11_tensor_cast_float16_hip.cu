@@ -19,7 +19,7 @@
 using Eigen::Tensor;
 
 void test_hip_conversion() {
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = 101;
 

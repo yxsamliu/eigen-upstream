@@ -32,7 +32,7 @@ void test_cuda_nullary() {
   cudaMemcpy(d_in1, in1.data(), tensor_bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_in2, in2.data(), tensor_bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 1, 0, int>, Eigen::Aligned> gpu_in1(
@@ -83,7 +83,7 @@ void test_cuda_elementwise_small() {
   cudaMemcpy(d_in1, in1.data(), in1_bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_in2, in2.data(), in2_bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 1>, Eigen::Aligned> gpu_in1(
@@ -138,7 +138,7 @@ void test_cuda_elementwise()
   cudaMemcpy(d_in2, in2.data(), in2_bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_in3, in3.data(), in3_bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 3> > gpu_in1(d_in1, Eigen::array<Eigen::DenseIndex, 3>(72,53,97));
@@ -180,7 +180,7 @@ void test_cuda_props() {
 
   cudaMemcpy(d_in1, in1.data(), in1_bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 1>, Eigen::Aligned> gpu_in1(
@@ -218,7 +218,7 @@ void test_cuda_reduction()
 
   cudaMemcpy(d_in1, in1.data(), in1_bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 4> > gpu_in1(d_in1, 72,53,97,113);
@@ -278,7 +278,7 @@ void test_cuda_contraction()
   cudaMemcpy(d_t_left, t_left.data(), t_left_bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_t_right, t_right.data(), t_right_bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout> > gpu_t_left(d_t_left, 6, 50, 3, 31);
@@ -335,7 +335,7 @@ void test_cuda_convolution_1d()
   cudaMemcpy(d_input, input.data(), input_bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_kernel, kernel.data(), kernel_bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout> > gpu_input(d_input, 74,37,11,137);
@@ -388,7 +388,7 @@ void test_cuda_convolution_inner_dim_col_major_1d()
   cudaMemcpy(d_input, input.data(), input_bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_kernel, kernel.data(), kernel_bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 4, ColMajor> > gpu_input(d_input,74,9,11,7);
@@ -441,7 +441,7 @@ void test_cuda_convolution_inner_dim_row_major_1d()
   cudaMemcpy(d_input, input.data(), input_bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_kernel, kernel.data(), kernel_bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 4, RowMajor> > gpu_input(d_input, 7,9,11,74);
@@ -495,7 +495,7 @@ void test_cuda_convolution_2d()
   cudaMemcpy(d_input, input.data(), input_bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_kernel, kernel.data(), kernel_bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout> > gpu_input(d_input,74,37,11,137);
@@ -559,7 +559,7 @@ void test_cuda_convolution_3d()
   cudaMemcpy(d_input, input.data(), input_bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_kernel, kernel.data(), kernel_bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;    
+  Eigen::GpuStreamDevice stream;    
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<float, 5, DataLayout> > gpu_input(d_input,74,37,11,137,17);
@@ -633,7 +633,7 @@ void test_cuda_lgamma(const Scalar stddev)
 
   cudaMemcpy(d_in, in.data(), bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 2> > gpu_in(d_in, 72, 97);
@@ -687,7 +687,7 @@ void test_cuda_digamma()
 
   cudaMemcpy(d_in, in.data(), bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 1> > gpu_in(d_in, 7);
@@ -751,7 +751,7 @@ void test_cuda_zeta()
   cudaMemcpy(d_in_x, in_x.data(), bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_in_q, in_q.data(), bytes, cudaMemcpyHostToDevice);
   
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 1> > gpu_in_x(d_in_x, 6);
@@ -822,7 +822,7 @@ void test_cuda_polygamma()
   cudaMemcpy(d_in_x, in_x.data(), bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_in_n, in_n.data(), bytes, cudaMemcpyHostToDevice);
   
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 1> > gpu_in_x(d_in_x, 7);
@@ -887,7 +887,7 @@ void test_cuda_igamma()
   cudaMemcpy(d_a, a.data(), bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_x, x.data(), bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 2> > gpu_a(d_a, 6, 6);
@@ -957,7 +957,7 @@ void test_cuda_igammac()
   cudaMemcpy(d_a, a.data(), bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_x, x.data(), bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 2> > gpu_a(d_a, 6, 6);
@@ -1002,7 +1002,7 @@ void test_cuda_erf(const Scalar stddev)
 
   cudaMemcpy(d_in, in.data(), bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 2> > gpu_in(d_in, 72, 97);
@@ -1041,7 +1041,7 @@ void test_cuda_erfc(const Scalar stddev)
 
   cudaMemcpy(d_in, in.data(), bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 2> > gpu_in(d_in, 72, 97);
@@ -1181,7 +1181,7 @@ void test_cuda_betainc()
   cudaMemcpy(d_in_a, in_a.data(), bytes, cudaMemcpyHostToDevice);
   cudaMemcpy(d_in_b, in_b.data(), bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 1> > gpu_in_x(d_in_x, 125);
@@ -1243,7 +1243,7 @@ void test_cuda_i0e()
 
   cudaMemcpy(d_in, in_x.data(), bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 1> > gpu_in(d_in, 21);
@@ -1298,7 +1298,7 @@ void test_cuda_i1e()
 
   cudaMemcpy(d_in, in_x.data(), bytes, cudaMemcpyHostToDevice);
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<Scalar, 1> > gpu_in(d_in, 21);

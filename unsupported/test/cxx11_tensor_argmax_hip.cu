@@ -40,7 +40,7 @@ void test_hip_simple_argmax()
 
   hipMemcpy(d_in, in.data(), in_bytes, hipMemcpyHostToDevice);
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   Eigen::TensorMap<Eigen::Tensor<double, 3, Layout>, Aligned > gpu_in(d_in, Eigen::array<DenseIndex, 3>(72,53,97));
@@ -102,7 +102,7 @@ void test_hip_argmax_dim()
 
     hipMemcpy(d_in, tensor.data(), in_bytes, hipMemcpyHostToDevice);
 
-    Eigen::HipStreamDevice stream;
+    Eigen::GpuStreamDevice stream;
     Eigen::GpuDevice gpu_device(&stream);
 
     Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout>, Aligned > gpu_in(d_in, Eigen::array<DenseIndex, 4>(2, 3, 5, 7));
@@ -191,7 +191,7 @@ void test_hip_argmin_dim()
 
     hipMemcpy(d_in, tensor.data(), in_bytes, hipMemcpyHostToDevice);
 
-    Eigen::HipStreamDevice stream;
+    Eigen::GpuStreamDevice stream;
     Eigen::GpuDevice gpu_device(&stream);
 
     Eigen::TensorMap<Eigen::Tensor<float, 4, DataLayout>, Aligned > gpu_in(d_in, Eigen::array<DenseIndex, 4>(2, 3, 5, 7));

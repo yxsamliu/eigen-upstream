@@ -19,7 +19,7 @@
 template<typename Type, int DataLayout>
 static void test_full_reductions() {
 
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
 
   const int num_rows = internal::random<int>(1024, 5*1024);
@@ -67,7 +67,7 @@ static void test_first_dim_reductions() {
   Tensor<Type, 2, DataLayout> redux = in.sum(red_axis);
 
   // Create device
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice dev(&stream);
   
   // Create data(T)
@@ -107,7 +107,7 @@ static void test_last_dim_reductions() {
   Tensor<Type, 2, DataLayout> redux = in.sum(red_axis);
 
   // Create device
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice dev(&stream);
   
   // Create data

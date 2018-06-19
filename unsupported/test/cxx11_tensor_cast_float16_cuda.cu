@@ -19,7 +19,7 @@
 using Eigen::Tensor;
 
 void test_cuda_conversion() {
-  Eigen::CudaStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = 101;
 

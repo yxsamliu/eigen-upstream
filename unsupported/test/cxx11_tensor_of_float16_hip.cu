@@ -21,7 +21,7 @@ using Eigen::Tensor;
 
 template<typename>
 void test_hip_numext() {
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = 101;
 
@@ -61,7 +61,7 @@ void test_hip_numext() {
 
 template<typename>
 void test_hip_conversion() {
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = 101;
   
@@ -96,7 +96,7 @@ void test_hip_conversion() {
 
 template<typename>
 void test_hip_unary() {
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = 101;
 
@@ -133,7 +133,7 @@ void test_hip_unary() {
 
 template<typename>
 void test_hip_elementwise() {
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = 101;
 
@@ -175,7 +175,7 @@ void test_hip_elementwise() {
 
 template<typename>
 void test_hip_trancendental() {
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = 101;
 
@@ -269,7 +269,7 @@ void test_hip_trancendental() {
 
 template<typename>
 void test_hip_contractions() {
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int rows = 23;
   int cols = 23;
@@ -324,7 +324,7 @@ void test_hip_reductions(int size1, int size2, int redux) {
    std::cout << "Reducing " << size1 << " by " << size2
              << " tensor along dim " << redux << std::endl; 
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = size1*size2;
   int result_size = (redux == 1 ? size1 : size2);
@@ -381,7 +381,7 @@ void test_hip_reductions() {
 
 template<typename>
 void test_hip_full_reductions() {
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int size = 13;
   int num_elem = size*size;
@@ -431,7 +431,7 @@ void test_hip_full_reductions() {
 template<typename>
 void test_hip_forced_evals() {
 
-  Eigen::HipStreamDevice stream;
+  Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = 101;
 
