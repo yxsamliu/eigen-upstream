@@ -9,7 +9,7 @@
 
 #define EIGEN_TEST_NO_LONGDOUBLE
 #define EIGEN_TEST_NO_COMPLEX
-#define EIGEN_TEST_FUNC cxx11_tensor_cast_float16_hip
+#define EIGEN_TEST_FUNC cxx11_tensor_cast_float16_gpu
 #define EIGEN_DEFAULT_DENSE_INDEX_TYPE int
 #define EIGEN_USE_GPU
 
@@ -18,7 +18,7 @@
 
 using Eigen::Tensor;
 
-void test_hip_conversion() {
+void test_gpu_conversion() {
   Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
   int num_elem = 101;
@@ -72,8 +72,8 @@ void test_fallback_conversion() {
 }
 
 
-void test_cxx11_tensor_cast_float16_hip()
+void test_cxx11_tensor_cast_float16_gpu()
 {
-  CALL_SUBTEST(test_hip_conversion());
+  CALL_SUBTEST(test_gpu_conversion());
   CALL_SUBTEST(test_fallback_conversion());
 }

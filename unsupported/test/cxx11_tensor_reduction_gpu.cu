@@ -9,7 +9,7 @@
 
 #define EIGEN_TEST_NO_LONGDOUBLE
 #define EIGEN_TEST_NO_COMPLEX
-#define EIGEN_TEST_FUNC cxx11_tensor_reduction_cuda
+#define EIGEN_TEST_FUNC cxx11_tensor_reduction_gpu
 #define EIGEN_USE_GPU
 
 #include "main.h"
@@ -134,7 +134,7 @@ static void test_last_dim_reductions() {
 }
 
 
-void test_cxx11_tensor_reduction_cuda() {
+void test_cxx11_tensor_reduction_gpu() {
   CALL_SUBTEST_1((test_full_reductions<float, ColMajor>()));
   CALL_SUBTEST_1((test_full_reductions<double, ColMajor>()));
   CALL_SUBTEST_2((test_full_reductions<float, RowMajor>()));

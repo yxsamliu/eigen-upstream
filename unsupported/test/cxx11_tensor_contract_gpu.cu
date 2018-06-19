@@ -10,19 +10,20 @@
 
 #define EIGEN_TEST_NO_LONGDOUBLE
 #define EIGEN_TEST_NO_COMPLEX
-#define EIGEN_TEST_FUNC cxx11_tensor_hip
+#define EIGEN_TEST_FUNC cxx11_tensor_gpu
 #define EIGEN_DEFAULT_DENSE_INDEX_TYPE int
 #define EIGEN_USE_GPU
 
 #include "main.h"
 #include <unsupported/Eigen/CXX11/Tensor>
 
+#include <unsupported/Eigen/CXX11/src/Tensor/TensorGpuHipCudaDefines.h>
 
 using Eigen::Tensor;
 typedef Tensor<float, 1>::DimensionPair DimPair;
 
 template<int DataLayout>
-void test_hip_contraction(int m_size, int k_size, int n_size)
+void test_gpu_contraction(int m_size, int k_size, int n_size)
 {
   std::cout << "Testing for (" << m_size << "," << k_size << "," << n_size << ")" << std::endl;
   // with these dimensions, the output has 300 * 140 elements, which is
@@ -45,12 +46,12 @@ void test_hip_contraction(int m_size, int k_size, int n_size)
   float* d_t_right;
   float* d_t_result;
 
-  hipMalloc((void**)(&d_t_left), t_left_bytes);
-  hipMalloc((void**)(&d_t_right), t_right_bytes);
-  hipMalloc((void**)(&d_t_result), t_result_bytes);
+  gpuMalloc((void**)(&d_t_left), t_left_bytes);
+  gpuMalloc((void**)(&d_t_right), t_right_bytes);
+  gpuMalloc((void**)(&d_t_result), t_result_bytes);
 
-  hipMemcpy(d_t_left, t_left.data(), t_left_bytes, hipMemcpyHostToDevice);
-  hipMemcpy(d_t_right, t_right.data(), t_right_bytes, hipMemcpyHostToDevice);
+  gpuMemcpy(d_t_left, t_left.data(), t_left_bytes, gpuMemcpyHostToDevice);
+  gpuMemcpy(d_t_right, t_right.data(), t_right_bytes, gpuMemcpyHostToDevice);
 
   Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
@@ -66,7 +67,7 @@ void test_hip_contraction(int m_size, int k_size, int n_size)
   gpu_t_result.device(gpu_device) = gpu_t_left.contract(gpu_t_right, dims);
   t_result = t_left.contract(t_right, dims);
 
-  hipMemcpy(t_result_gpu.data(), d_t_result, t_result_bytes, hipMemcpyDeviceToHost);
+  gpuMemcpy(t_result_gpu.data(), d_t_result, t_result_bytes, gpuMemcpyDeviceToHost);
   for (DenseIndex i = 0; i < t_result.size(); i++) {
     if (fabs(t_result(i) - t_result_gpu(i)) < 1e-4f) {
       continue;
@@ -79,9 +80,9 @@ void test_hip_contraction(int m_size, int k_size, int n_size)
     assert(false);
   }
 
-  hipFree((void*)d_t_left);
-  hipFree((void*)d_t_right);
-  hipFree((void*)d_t_result);
+  gpuFree((void*)d_t_left);
+  gpuFree((void*)d_t_right);
+  gpuFree((void*)d_t_result);
 }
 
 
@@ -109,12 +110,12 @@ void test_scalar(int m_size, int k_size, int n_size)
   float* d_t_right;
   float* d_t_result;
 
-  hipMalloc((void**)(&d_t_left), t_left_bytes);
-  hipMalloc((void**)(&d_t_right), t_right_bytes);
-  hipMalloc((void**)(&d_t_result), t_result_bytes);
+  gpuMalloc((void**)(&d_t_left), t_left_bytes);
+  gpuMalloc((void**)(&d_t_right), t_right_bytes);
+  gpuMalloc((void**)(&d_t_result), t_result_bytes);
 
-  hipMemcpy(d_t_left, t_left.data(), t_left_bytes, hipMemcpyHostToDevice);
-  hipMemcpy(d_t_right, t_right.data(), t_right_bytes, hipMemcpyHostToDevice);
+  gpuMemcpy(d_t_left, t_left.data(), t_left_bytes, gpuMemcpyHostToDevice);
+  gpuMemcpy(d_t_right, t_right.data(), t_right_bytes, gpuMemcpyHostToDevice);
 
   Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
@@ -129,7 +130,7 @@ void test_scalar(int m_size, int k_size, int n_size)
   gpu_t_result.device(gpu_device) = gpu_t_left.contract(gpu_t_right, dims);
   t_result = t_left.contract(t_right, dims);
 
-  hipMemcpy(t_result_gpu.data(), d_t_result, t_result_bytes, hipMemcpyDeviceToHost);
+  gpuMemcpy(t_result_gpu.data(), d_t_result, t_result_bytes, gpuMemcpyDeviceToHost);
   if (fabs(t_result() - t_result_gpu()) > 1e-4f &&
       !Eigen::internal::isApprox(t_result(), t_result_gpu(), 1e-4f)) {
     std::cout << "mismatch detected: " << t_result()
@@ -137,39 +138,39 @@ void test_scalar(int m_size, int k_size, int n_size)
     assert(false);
   }
 
-  hipFree((void*)d_t_left);
-  hipFree((void*)d_t_right);
-  hipFree((void*)d_t_result);
+  gpuFree((void*)d_t_left);
+  gpuFree((void*)d_t_right);
+  gpuFree((void*)d_t_result);
 }
 
 
 template<int DataLayout>
-void test_hip_contraction_m() {
+void test_gpu_contraction_m() {
   for (int k = 32; k < 256; k++) {
-    test_hip_contraction<ColMajor>(k, 128, 128);
-    test_hip_contraction<RowMajor>(k, 128, 128);
+    test_gpu_contraction<ColMajor>(k, 128, 128);
+    test_gpu_contraction<RowMajor>(k, 128, 128);
   }
 }
 
 template<int DataLayout>
-void test_hip_contraction_k() {
+void test_gpu_contraction_k() {
   for (int k = 32; k < 256; k++) {
-    test_hip_contraction<ColMajor>(128, k, 128);
-    test_hip_contraction<RowMajor>(128, k, 128);
+    test_gpu_contraction<ColMajor>(128, k, 128);
+    test_gpu_contraction<RowMajor>(128, k, 128);
   }
 }
 
 template<int DataLayout>
-void test_hip_contraction_n() {
+void test_gpu_contraction_n() {
   for (int k = 32; k < 256; k++) {
-    test_hip_contraction<ColMajor>(128, 128, k);
-    test_hip_contraction<RowMajor>(128, 128, k);
+    test_gpu_contraction<ColMajor>(128, 128, k);
+    test_gpu_contraction<RowMajor>(128, 128, k);
   }
 }
 
 
 template<int DataLayout>
-void test_hip_contraction_sizes() {
+void test_gpu_contraction_sizes() {
   int m_sizes[] = { 31,  39,   63,   64,   65,
                    127, 129,  255,  257 , 511,
                    512, 513, 1023, 1024, 1025};
@@ -186,30 +187,32 @@ void test_hip_contraction_sizes() {
   for (int i = 0; i < 15; i++) {
     for (int j = 0; j < 15; j++) {
       for (int k = 0; k < 17; k++) {
-        test_hip_contraction<DataLayout>(m_sizes[i], n_sizes[j], k_sizes[k]);
+        test_gpu_contraction<DataLayout>(m_sizes[i], n_sizes[j], k_sizes[k]);
       }
     }
   }
 }
 
-void test_cxx11_tensor_hip()
+void test_cxx11_tensor_gpu()
 {
-  CALL_SUBTEST(test_hip_contraction<ColMajor>(128, 128, 128));
-  CALL_SUBTEST(test_hip_contraction<RowMajor>(128, 128, 128));
+  CALL_SUBTEST_1(test_gpu_contraction<ColMajor>(128, 128, 128));
+  CALL_SUBTEST_1(test_gpu_contraction<RowMajor>(128, 128, 128));
 
-  CALL_SUBTEST(test_scalar<ColMajor>(128, 128, 128));
-  CALL_SUBTEST(test_scalar<RowMajor>(128, 128, 128));
+  CALL_SUBTEST_1(test_scalar<ColMajor>(128, 128, 128));
+  CALL_SUBTEST_1(test_scalar<RowMajor>(128, 128, 128));
 
-  CALL_SUBTEST(test_hip_contraction_m<ColMajor>());
-  CALL_SUBTEST(test_hip_contraction_m<RowMajor>());
+  CALL_SUBTEST_2(test_gpu_contraction_m<ColMajor>());
+  CALL_SUBTEST_3(test_gpu_contraction_m<RowMajor>());
 
-  CALL_SUBTEST(test_hip_contraction_k<ColMajor>());
-  CALL_SUBTEST(test_hip_contraction_k<RowMajor>());
+  CALL_SUBTEST_4(test_gpu_contraction_k<ColMajor>());
+  CALL_SUBTEST_5(test_gpu_contraction_k<RowMajor>());
 
-  CALL_SUBTEST(test_hip_contraction_n<ColMajor>());
-  CALL_SUBTEST(test_hip_contraction_n<RowMajor>());
+  CALL_SUBTEST_6(test_gpu_contraction_n<ColMajor>());
+  CALL_SUBTEST_7(test_gpu_contraction_n<RowMajor>());
 
-  // Commenting out these tests due to long runtimes
-  // CALL_SUBTEST(test_hip_contraction_sizes<ColMajor>());
-  // CALL_SUBTEST(test_hip_contraction_sizes<RowMajor>());
+#if !defined(EIGEN_USE_HIP)
+// disable these subtests for HIP
+  CALL_SUBTEST_8(test_gpu_contraction_sizes<ColMajor>());
+  CALL_SUBTEST_9(test_gpu_contraction_sizes<RowMajor>());
+#endif	
 }
