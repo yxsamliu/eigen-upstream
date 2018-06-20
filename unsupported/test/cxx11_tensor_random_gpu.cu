@@ -38,7 +38,7 @@ void test_gpu_random_uniform()
   assert(gpuMemcpyAsync(out.data(), d_out, out_bytes, gpuMemcpyDeviceToHost, gpu_device.stream()) == gpuSuccess);
   assert(gpuStreamSynchronize(gpu_device.stream()) == gpuSuccess);
 
-  // For now we just check thes code doesn't crash.
+  // For now we just check this code doesn't crash.
   // TODO: come up with a valid test of randomness
 }
 
