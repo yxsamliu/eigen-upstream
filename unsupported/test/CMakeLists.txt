@@ -318,9 +318,13 @@ if (EIGEN_TEST_HIP)
 	include_directories(${HIP_PATH}/include)
 
 	set(EIGEN_ADD_TEST_FILENAME_EXTENSION  "cu")
-
+	#
+	# complex datatype is not yet supported by HIP
+	# so leaving out those tests for now
+	#
 	# ei_add_test(cxx11_tensor_complex_gpu)
 	# ei_add_test(cxx11_tensor_complex_cwise_ops_gpu)
+	#
 	ei_add_test(cxx11_tensor_reduction_gpu)
 	ei_add_test(cxx11_tensor_argmax_gpu)
 	ei_add_test(cxx11_tensor_cast_float16_gpu)
