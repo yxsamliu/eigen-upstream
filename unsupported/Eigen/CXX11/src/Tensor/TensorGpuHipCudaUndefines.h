@@ -8,8 +8,7 @@
 // Public License v. 2.0. If a copy of the MPL was not distributed
 // with this file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-#if defined(EIGEN_USE_GPU) && !defined(EIGEN_CXX11_TENSOR_GPU_HIP_CUDA_UNDEFINES_H)
-#define EIGEN_CXX11_TENSOR_GPU_HIP_CUDA_UNDEFINES_H
+#if defined(EIGEN_CXX11_TENSOR_GPU_HIP_CUDA_DEFINES_H)
 
 #undef gpuStream_t
 #undef gpuDeviceProp_t 
@@ -33,6 +32,8 @@
 #undef gpuSharedMemConfig
 #undef gpuDeviceSetSharedMemConfig
 #undef gpuStreamSynchronize
+#undef gpuMemcpy
 
+#undef EIGEN_CXX11_TENSOR_GPU_HIP_CUDA_DEFINES_H
 
-#endif  // EIGEN_CXX11_TENSOR_GPU_HIP_CUDA_UNDEFINES_H
+#endif // EIGEN_CXX11_TENSOR_GPU_HIP_CUDA_DEFINES_H

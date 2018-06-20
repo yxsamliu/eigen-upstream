@@ -47,6 +47,7 @@
 #define gpuSharedMemConfig hipSharedMemConfig
 #define gpuDeviceSetSharedMemConfig hipDeviceSetSharedMemConfig
 #define gpuStreamSynchronize hipStreamSynchronize
+#define gpuMemcpy hipMemcpy
 
 #else
 
@@ -72,6 +73,7 @@
 #define gpuSharedMemConfig cudaSharedMemConfig
 #define gpuDeviceSetSharedMemConfig cudaDeviceSetSharedMemConfig
 #define gpuStreamSynchronize cudaStreamSynchronize
+#define gpuMemcpy cudaMemcpy
 
 #endif
 

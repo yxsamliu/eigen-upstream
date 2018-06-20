@@ -9,16 +9,18 @@
 
 
 #define EIGEN_TEST_NO_LONGDOUBLE
-#define EIGEN_TEST_FUNC cxx11_tensor_hip
+#define EIGEN_TEST_FUNC cxx11_tensor_gpu
 #define EIGEN_USE_GPU
 
 #include "main.h"
 #include <unsupported/Eigen/CXX11/Tensor>
 
+#include <unsupported/Eigen/CXX11/src/Tensor/TensorGpuHipCudaDefines.h>
+
 using Eigen::Tensor;
 
 template <int Layout>
-void test_hip_simple_argmax()
+void test_gpu_simple_argmax()
 {
   Tensor<double, 3, Layout> in(Eigen::array<DenseIndex, 3>(72,53,97));
   Tensor<DenseIndex, 1, Layout> out_max(Eigen::array<DenseIndex, 1>(1));
@@ -34,11 +36,11 @@ void test_hip_simple_argmax()
   double* d_in;
   DenseIndex* d_out_max;
   DenseIndex* d_out_min;
-  hipMalloc((void**)(&d_in), in_bytes);
-  hipMalloc((void**)(&d_out_max), out_bytes);
-  hipMalloc((void**)(&d_out_min), out_bytes);
+  gpuMalloc((void**)(&d_in), in_bytes);
+  gpuMalloc((void**)(&d_out_max), out_bytes);
+  gpuMalloc((void**)(&d_out_min), out_bytes);
 
-  hipMemcpy(d_in, in.data(), in_bytes, hipMemcpyHostToDevice);
+  gpuMemcpy(d_in, in.data(), in_bytes, gpuMemcpyHostToDevice);
 
   Eigen::GpuStreamDevice stream;
   Eigen::GpuDevice gpu_device(&stream);
@@ -50,20 +52,20 @@ void test_hip_simple_argmax()
   gpu_out_max.device(gpu_device) = gpu_in.argmax();
   gpu_out_min.device(gpu_device) = gpu_in.argmin();
 
-  assert(hipMemcpyAsync(out_max.data(), d_out_max, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
-  assert(hipMemcpyAsync(out_min.data(), d_out_min, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
-  assert(hipStreamSynchronize(gpu_device.stream()) == hipSuccess);
+  assert(gpuMemcpyAsync(out_max.data(), d_out_max, out_bytes, gpuMemcpyDeviceToHost, gpu_device.stream()) == gpuSuccess);
+  assert(gpuMemcpyAsync(out_min.data(), d_out_min, out_bytes, gpuMemcpyDeviceToHost, gpu_device.stream()) == gpuSuccess);
+  assert(gpuStreamSynchronize(gpu_device.stream()) == gpuSuccess);
 
   VERIFY_IS_EQUAL(out_max(Eigen::array<DenseIndex, 1>(0)), 72*53*97 - 1);
   VERIFY_IS_EQUAL(out_min(Eigen::array<DenseIndex, 1>(0)), 0);
 
-  hipFree(d_in);
-  hipFree(d_out_max);
-  hipFree(d_out_min);
+  gpuFree(d_in);
+  gpuFree(d_out_max);
+  gpuFree(d_out_min);
 }
 
 template <int DataLayout>
-void test_hip_argmax_dim()
+void test_gpu_argmax_dim()
 {
   Tensor<float, 4, DataLayout> tensor(2,3,5,7);
   std::vector<int> dims;
@@ -97,10 +99,10 @@ void test_hip_argmax_dim()
 
     float* d_in;
     DenseIndex* d_out;
-    hipMalloc((void**)(&d_in), in_bytes);
-    hipMalloc((void**)(&d_out), out_bytes);
+    gpuMalloc((void**)(&d_in), in_bytes);
+    gpuMalloc((void**)(&d_out), out_bytes);
 
-    hipMemcpy(d_in, tensor.data(), in_bytes, hipMemcpyHostToDevice);
+    gpuMemcpy(d_in, tensor.data(), in_bytes, gpuMemcpyHostToDevice);
 
     Eigen::GpuStreamDevice stream;
     Eigen::GpuDevice gpu_device(&stream);
@@ -110,8 +112,8 @@ void test_hip_argmax_dim()
 
     gpu_out.device(gpu_device) = gpu_in.argmax(dim);
 
-    assert(hipMemcpyAsync(tensor_arg.data(), d_out, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
-    assert(hipStreamSynchronize(gpu_device.stream()) == hipSuccess);
+    assert(gpuMemcpyAsync(tensor_arg.data(), d_out, out_bytes, gpuMemcpyDeviceToHost, gpu_device.stream()) == gpuSuccess);
+    assert(gpuStreamSynchronize(gpu_device.stream()) == gpuSuccess);
 
     VERIFY_IS_EQUAL(tensor_arg.size(),
                     size_t(2*3*5*7 / tensor.dimension(dim)));
@@ -134,25 +136,25 @@ void test_hip_argmax_dim()
       }
     }
 
-    hipMemcpy(d_in, tensor.data(), in_bytes, hipMemcpyHostToDevice);
+    gpuMemcpy(d_in, tensor.data(), in_bytes, gpuMemcpyHostToDevice);
 
     gpu_out.device(gpu_device) = gpu_in.argmax(dim);
 
-    assert(hipMemcpyAsync(tensor_arg.data(), d_out, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
-    assert(hipStreamSynchronize(gpu_device.stream()) == hipSuccess);
+    assert(gpuMemcpyAsync(tensor_arg.data(), d_out, out_bytes, gpuMemcpyDeviceToHost, gpu_device.stream()) == gpuSuccess);
+    assert(gpuStreamSynchronize(gpu_device.stream()) == gpuSuccess);
 
     for (DenseIndex n = 0; n < tensor_arg.size(); ++n) {
       // Expect max to be in the last index of the reduced dimension
       VERIFY_IS_EQUAL(tensor_arg.data()[n], tensor.dimension(dim) - 1);
     }
 
-    hipFree(d_in);
-    hipFree(d_out);
+    gpuFree(d_in);
+    gpuFree(d_out);
   }
 }
 
 template <int DataLayout>
-void test_hip_argmin_dim()
+void test_gpu_argmin_dim()
 {
   Tensor<float, 4, DataLayout> tensor(2,3,5,7);
   std::vector<int> dims;
@@ -186,10 +188,10 @@ void test_hip_argmin_dim()
 
     float* d_in;
     DenseIndex* d_out;
-    hipMalloc((void**)(&d_in), in_bytes);
-    hipMalloc((void**)(&d_out), out_bytes);
+    gpuMalloc((void**)(&d_in), in_bytes);
+    gpuMalloc((void**)(&d_out), out_bytes);
 
-    hipMemcpy(d_in, tensor.data(), in_bytes, hipMemcpyHostToDevice);
+    gpuMemcpy(d_in, tensor.data(), in_bytes, gpuMemcpyHostToDevice);
 
     Eigen::GpuStreamDevice stream;
     Eigen::GpuDevice gpu_device(&stream);
@@ -199,8 +201,8 @@ void test_hip_argmin_dim()
 
     gpu_out.device(gpu_device) = gpu_in.argmin(dim);
 
-    assert(hipMemcpyAsync(tensor_arg.data(), d_out, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
-    assert(hipStreamSynchronize(gpu_device.stream()) == hipSuccess);
+    assert(gpuMemcpyAsync(tensor_arg.data(), d_out, out_bytes, gpuMemcpyDeviceToHost, gpu_device.stream()) == gpuSuccess);
+    assert(gpuStreamSynchronize(gpu_device.stream()) == gpuSuccess);
 
     VERIFY_IS_EQUAL(tensor_arg.size(),
                     2*3*5*7 / tensor.dimension(dim));
@@ -223,29 +225,29 @@ void test_hip_argmin_dim()
       }
     }
 
-    hipMemcpy(d_in, tensor.data(), in_bytes, hipMemcpyHostToDevice);
+    gpuMemcpy(d_in, tensor.data(), in_bytes, gpuMemcpyHostToDevice);
 
     gpu_out.device(gpu_device) = gpu_in.argmin(dim);
 
-    assert(hipMemcpyAsync(tensor_arg.data(), d_out, out_bytes, hipMemcpyDeviceToHost, gpu_device.stream()) == hipSuccess);
-    assert(hipStreamSynchronize(gpu_device.stream()) == hipSuccess);
+    assert(gpuMemcpyAsync(tensor_arg.data(), d_out, out_bytes, gpuMemcpyDeviceToHost, gpu_device.stream()) == gpuSuccess);
+    assert(gpuStreamSynchronize(gpu_device.stream()) == gpuSuccess);
 
     for (DenseIndex n = 0; n < tensor_arg.size(); ++n) {
       // Expect max to be in the last index of the reduced dimension
       VERIFY_IS_EQUAL(tensor_arg.data()[n], tensor.dimension(dim) - 1);
     }
 
-    hipFree(d_in);
-    hipFree(d_out);
+    gpuFree(d_in);
+    gpuFree(d_out);
   }
 }
 
-void test_cxx11_tensor_hip()
+void test_cxx11_tensor_gpu()
 {
-  CALL_SUBTEST(test_hip_simple_argmax<RowMajor>());
-  CALL_SUBTEST(test_hip_simple_argmax<ColMajor>());
-  CALL_SUBTEST(test_hip_argmax_dim<RowMajor>());
-  CALL_SUBTEST(test_hip_argmax_dim<ColMajor>());
-  CALL_SUBTEST(test_hip_argmin_dim<RowMajor>());
-  CALL_SUBTEST(test_hip_argmin_dim<ColMajor>());
+  CALL_SUBTEST_1(test_gpu_simple_argmax<RowMajor>());
+  CALL_SUBTEST_1(test_gpu_simple_argmax<ColMajor>());
+  CALL_SUBTEST_2(test_gpu_argmax_dim<RowMajor>());
+  CALL_SUBTEST_2(test_gpu_argmax_dim<ColMajor>());
+  CALL_SUBTEST_3(test_gpu_argmin_dim<RowMajor>());
+  CALL_SUBTEST_3(test_gpu_argmin_dim<ColMajor>());
 }
