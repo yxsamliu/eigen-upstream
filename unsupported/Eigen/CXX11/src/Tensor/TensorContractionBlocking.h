@@ -28,10 +28,7 @@ class TensorContractionBlocking {
   typedef typename LhsMapper::Scalar LhsScalar;
   typedef typename RhsMapper::Scalar RhsScalar;
 
-  #if !defined(EIGEN_HIPCC)
-  EIGEN_DEVICE_FUNC
-  #endif
- TensorContractionBlocking(Index k, Index m, Index n, Index num_threads = 1) :
+  EIGEN_DEVICE_FUNC TensorContractionBlocking(Index k, Index m, Index n, Index num_threads = 1) :
       kc_(k), mc_(m), nc_(n)
   {
     if (ShardingType == ShardByCol) {
