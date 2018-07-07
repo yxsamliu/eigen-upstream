@@ -240,20 +240,6 @@ __global__ void FullReductionKernelHalfFloat(Reducer reducer, const Self input, 
 
   // Initialize the output value if it wasn't initialized by the ReductionInitKernel
 
-#if defined(EIGEN_HIPCC)
-  
-  if (gridDim.x == 1 && first_index == 0) {
-    if (num_coeffs % 2 != 0) {
-      half last = input.m_impl.coeff(num_coeffs-1);
-      *scratch = __halves2half2(last, reducer.initialize());
-    } else {
-      *scratch = reducer.template initializePacket<half2>();
-    }
-    __syncthreads();
-  }
-  
-#else
-  
   if (gridDim.x == 1) {
     if (first_index == 0) {
       if (num_coeffs % 2 != 0) {
@@ -266,8 +252,6 @@ __global__ void FullReductionKernelHalfFloat(Reducer reducer, const Self input, 
     __syncthreads();
   }
   
-#endif
-
   half2 accum = reducer.template initializePacket<half2>();
   const Index max_iter = numext::mini<Index>((num_coeffs - first_index) / 2, NumPerThread*BlockSize / 2);
   for (Index i = 0; i < max_iter; i += BlockSize) {
@@ -297,17 +281,6 @@ __global__ void FullReductionKernelHalfFloat(Reducer reducer, const Self input, 
     atomicReduce(scratch, accum, reducer);
   }
 
-#if defined(EIGEN_HIPCC)
-  __syncthreads();
-
-  if (gridDim.x == 1 && first_index == 0) {
-    half tmp = __low2half(*scratch);
-    reducer.reduce(__high2half(*scratch), &tmp);
-    *output = tmp;
-  }
-
-#else
-    
   if (gridDim.x == 1) {
     __syncthreads();
     if (first_index == 0) {
@@ -316,8 +289,6 @@ __global__ void FullReductionKernelHalfFloat(Reducer reducer, const Self input, 
       *output = tmp;
     }
   }
-
-#endif
 }
 
 template <typename Op>
@@ -850,9 +821,5 @@ struct OuterReducer<Self, Op, GpuDevice> {
 
 } // end namespace internal
 } // end namespace Eigen
-
-#if defined(EIGEN_HIPCC)
-#undef warpSize
-#endif
 
 #endif // EIGEN_CXX11_TENSOR_TENSOR_REDUCTION_GPU_H
