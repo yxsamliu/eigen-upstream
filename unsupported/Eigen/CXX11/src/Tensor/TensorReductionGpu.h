@@ -169,7 +169,9 @@ __global__ void FullReductionKernel(Reducer reducer, const Self input, Index num
 #pragma unroll
   for (int offset = warpSize/2; offset > 0; offset /= 2) {
   #if defined(EIGEN_HIPCC)
-    // XXX use std::is_floating_point to determine the type of accum
+    // use std::is_floating_point to determine the type of reduced_val 
+    // This is needed because when Type == double, hipcc will give a "call to __shfl_down is ambguous" error 
+    // and list the float and int versions of __shfl_down as the candidate functions. 
     if (std::is_floating_point<typename Self::CoeffReturnType>::value) {
       reducer.reduce(__shfl_down(static_cast<float>(accum), offset, warpSize), &accum);
     } else {
@@ -485,7 +487,9 @@ __global__ void InnerReductionKernel(Reducer reducer, const Self input, Index nu
 #pragma unroll
       for (int offset = warpSize/2; offset > 0; offset /= 2) {
       #if defined(EIGEN_HIPCC)
-        // XXX use std::is_floating_point to determine the type of reduced_val
+        // use std::is_floating_point to determine the type of reduced_val 
+	// This is needed because when Type == double, hipcc will give a "call to __shfl_down is ambguous" error 
+	// and list the float and int versions of __shfl_down as the candidate functions. 
         if (std::is_floating_point<Type>::value) {
           reducer.reduce(__shfl_down(static_cast<float>(reduced_val), offset), &reduced_val);
         } else {
